@@ -287,7 +287,7 @@ def run_policy_extensions(
     sensitivity_df = pd.DataFrame(sensitivity_rows)
     sensitivity_df.to_csv(output_sensitivity_csv, index=False)
 
-    fig, ax = plt.subplots(figsize=(7.8, 4.8))
+    fig, ax = plt.subplots(figsize=(8.2, 5.1))
     scatter = ax.scatter(
         sensitivity_df["over_provisioning"],
         sensitivity_df["sla_violation"],
@@ -295,19 +295,46 @@ def run_policy_extensions(
         s=65,
         cmap="viridis",
     )
+    annotation_offsets = {
+        (0.00, 0): (6, 3, "left"),
+        (0.00, 8): (-8, 10, "right"),
+        (0.00, 12): (6, 3, "left"),
+        (0.10, 0): (12, 8, "left"),
+        (0.10, 8): (10, 4, "left"),
+        (0.10, 12): (12, -6, "left"),
+        (0.15, 0): (8, 4, "left"),
+        (0.15, 8): (-12, 10, "right"),
+        (0.15, 12): (-12, -4, "right"),
+    }
     for _, row in sensitivity_df.iterrows():
-        if row["scale_out_margin"] in (0.0, 0.10, 0.15) and row["cooldown_steps"] in (0, 8, 12):
+        key = (round(float(row["scale_out_margin"]), 2), int(row["cooldown_steps"]))
+        if key in annotation_offsets:
+            offset_x, offset_y, ha = annotation_offsets[key]
             ax.annotate(
                 f"m={row['scale_out_margin']:.2f}, c={int(row['cooldown_steps'])}",
                 (row["over_provisioning"], row["sla_violation"]),
                 textcoords="offset points",
-                xytext=(5, 3),
+                xytext=(offset_x, offset_y),
+                ha=ha,
                 fontsize=8,
+                bbox={
+                    "boxstyle": "round,pad=0.15",
+                    "facecolor": "white",
+                    "alpha": 0.75,
+                    "edgecolor": "none",
+                },
+                arrowprops={"arrowstyle": "-", "color": "#666666", "lw": 0.5, "alpha": 0.6},
             )
     ax.set_xlabel("Over-provisioning")
     ax.set_ylabel("SLA violation")
     ax.set_title("Policy sensitivity under margin and cooldown changes")
     ax.grid(alpha=0.18, linewidth=0.5)
+    x_min = float(sensitivity_df["over_provisioning"].min())
+    x_max = float(sensitivity_df["over_provisioning"].max())
+    y_min = float(sensitivity_df["sla_violation"].min())
+    y_max = float(sensitivity_df["sla_violation"].max())
+    ax.set_xlim(x_min - 0.006, x_max + 0.012)
+    ax.set_ylim(max(0.0, y_min - 0.008), y_max + 0.008)
     cbar = fig.colorbar(scatter, ax=ax)
     cbar.set_label("Scale-out margin")
     save_figure(fig, output_sensitivity_png)

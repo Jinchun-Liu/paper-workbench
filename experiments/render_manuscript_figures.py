@@ -188,7 +188,9 @@ def render_mae_figure(metrics_df: pd.DataFrame, path: Path) -> None:
     ax.set_xticklabels([f"{h} min" for h in horizon_order])
     ax.set_ylabel("MAE")
     ax.set_title("Forecast error by model and horizon")
-    ax.legend(frameon=False, ncols=2)
+    ymax = float(forecast_df["mae"].max())
+    ax.set_ylim(0.0, ymax * 1.18)
+    ax.legend(frameon=False, ncols=2, loc="upper left")
 
     save_figure(fig, path)
 
@@ -245,10 +247,16 @@ def render_case_study(
         ax.set_title(f"Case study at {horizon}-minute horizon")
         ax.set_ylabel("CPU utilization (%)")
         ax.grid(alpha=0.15, linewidth=0.5)
+        plotted = [actual[start:end], ua_predictions_arr[start:end]]
+        plotted.extend(output.y_pred[start:end] for output in model_outputs.values())
+        y_min = min(float(np.min(series_slice)) for series_slice in plotted)
+        y_max = max(float(np.max(series_slice)) for series_slice in plotted)
+        y_pad = max(2.0, 0.20 * (y_max - y_min))
+        ax.set_ylim(y_min - y_pad * 0.35, y_max + y_pad)
 
     axes[-1].set_xlabel("Aligned test-step index")
     handles, labels = axes[0].get_legend_handles_labels()
-    axes[0].legend(handles, labels, frameon=False, ncols=5, loc="upper right")
+    axes[0].legend(handles, labels, frameon=False, ncols=5, loc="upper center", bbox_to_anchor=(0.63, 1.02))
 
     save_figure(fig, path)
 
@@ -272,15 +280,30 @@ def render_latency_tradeoff(metrics_df: pd.DataFrame, path: Path) -> None:
 
     fig, ax = plt.subplots(figsize=(7.5, 4.8))
     ax.scatter(summary["latency_ms"], summary["mae"], s=90, color="#0f7b6c")
+    x_max = float(summary["latency_ms"].max())
+    x_offsets = {
+        "moving_average": (6, 4, "left"),
+        "persistence": (6, 4, "left"),
+        "linear_regression": (6, 4, "left"),
+        "mlp_regressor": (6, 4, "left"),
+        "ua_mstcn_lite_quantile_forest": (6, 4, "left"),
+        "random_forest": (-8, -2, "right"),
+    }
     for _, row in summary.iterrows():
+        offset_x, offset_y, ha = x_offsets.get(row["model_name"], (6, 4, "left"))
+        if row["latency_ms"] >= 0.82 * x_max and ha == "left":
+            offset_x, offset_y, ha = (-8, 4, "right")
         ax.annotate(
             display_names[row["model_name"]],
             (row["latency_ms"], row["mae"]),
             textcoords="offset points",
-            xytext=(6, 4),
+            xytext=(offset_x, offset_y),
+            ha=ha,
             fontsize=9,
         )
     ax.set_xscale("log")
+    ax.set_xlim(float(summary["latency_ms"].min()) * 0.75, x_max * 1.65)
+    ax.set_ylim(float(summary["mae"].min()) - 0.03, float(summary["mae"].max()) + 0.05)
     ax.set_xlabel("Average runtime per benchmark call (ms, log scale)")
     ax.set_ylabel("Average MAE across horizons")
     ax.set_title("Accuracy-latency trade-off")
@@ -316,6 +339,32 @@ def render_policy_view(policy_series_csv: Path, path: Path) -> None:
     ax.set_title("Policy trajectories on the evaluation horizon")
     ax.legend(frameon=False, ncols=2)
     ax.grid(alpha=0.15, linewidth=0.5)
+    y_min = float(
+        sample[
+            [
+                "actual_required_capacity",
+                "reactive_capacity",
+                "lagged_capacity",
+                "predictive_capacity",
+                "forecast_p50",
+                "forecast_p90",
+            ]
+        ].min().min()
+    )
+    y_max = float(
+        sample[
+            [
+                "actual_required_capacity",
+                "reactive_capacity",
+                "lagged_capacity",
+                "predictive_capacity",
+                "forecast_p50",
+                "forecast_p90",
+            ]
+        ].max().max()
+    )
+    y_pad = max(0.03, 0.16 * (y_max - y_min))
+    ax.set_ylim(y_min - y_pad * 0.3, y_max + y_pad)
 
     save_figure(fig, path)
 
