@@ -1,0 +1,41 @@
+package_name: trace-driven-proactive-autoscaling-review-package
+package_version: review-freeze-2026-03-12
+description: >
+  Frozen reproducibility package for the current manuscript version. The package
+  is intended for editor and reviewer audit during peer review and excludes the
+  third-party raw Alibaba archives.
+include_paths:
+  - README.md
+  - CITATION.cff
+  - 00-status.md
+  - data/README.md
+  - data/processed
+  - experiments
+  - literature/evidence-ledger.csv
+  - manuscript
+  - review/reviewer_feedback.md
+  - scripts/build_repro_package.py
+  - submission/checklist.md
+  - submission/cover-letter.md
+  - submission/cover-letter_jgc.md
+  - submission/highlights.md
+  - submission/reproducibility-package-manifest.yaml
+  - submission/reproducibility-package.md
+exclude_globs:
+  - ".DS_Store"
+  - "**/.DS_Store"
+  - "data/raw/**"
+  - "experiments/__pycache__/**"
+  - "experiments/**/*.pyc"
+  - "manuscript/*.aux"
+  - "manuscript/*.bbl"
+  - "manuscript/*.blg"
+  - "manuscript/*.fdb_latexmk"
+  - "manuscript/*.fls"
+  - "manuscript/*.log"
+  - "manuscript/*.out"
+  - "manuscript/*.synctex.gz"
+  - "submission/frozen-package/**"
+notes:
+  - Raw Alibaba cluster archives are not redistributed by this package.
+  - The frozen package is intended to preserve the exact manuscript-facing processed artifacts and figures used in the current review version.

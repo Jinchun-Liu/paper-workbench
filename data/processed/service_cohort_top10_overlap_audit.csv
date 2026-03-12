@@ -1,0 +1,11 @@
+app_du,in_top10,in_meta_prefilter,in_full_profile,in_broad,status,reason_if_excluded,coverage_ratio,container_hit_ratio
+app_141,True,True,True,True,retained,,0.9728298611111111,0.9979591836734694
+app_7876,True,True,True,True,retained,,0.9729166666666667,0.9766081871345029
+app_3073,True,True,True,True,retained,,0.9727430555555555,1.0
+app_1063,True,True,True,True,retained,,0.9724826388888889,1.0
+app_512,True,True,True,True,retained,,0.97265625,1.0
+app_565,True,True,True,True,retained,,0.9725694444444445,1.0
+app_3641,True,True,True,True,retained,,0.97265625,0.9935483870967742
+app_2241,True,True,True,True,retained,,0.9727430555555555,1.0
+app_6658,True,True,True,True,retained,,0.97265625,0.963302752293578
+app_1826,True,True,True,True,retained,,0.9725694444444445,1.0

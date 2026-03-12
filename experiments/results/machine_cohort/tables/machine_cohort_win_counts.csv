@@ -1,0 +1,11 @@
+horizon,model_name,win_count
+1,linear_regression,6
+1,persistence,4
+1,ua_mstcn_lite_quantile_forest,2
+5,linear_regression,8
+5,ua_mstcn_lite_quantile_forest,3
+5,persistence,1
+10,linear_regression,8
+10,ua_mstcn_lite_quantile_forest,2
+10,persistence,1
+10,random_forest,1

@@ -1,0 +1,40 @@
+\subsection{Representative precedent studies}
+
+Representative prior studies already span host-load prediction \citep{Dinda2000HostLoad}, container autoscaling and metric selection \citep{Casalicchio2019ContainerAutoscaling}, service-granular microservice resource management \citep{ZargarAzad2023MicroserviceFramework,Puebla2024CdaScaler}, uncertainty-aware workload forecasting with transfer learning \citep{Rossi2025UncertaintyAwareForecasting}, and recent predictive autoscaling frameworks for cloud environments \citep{Zanussi2026LoadAwareAutoscaling}. Together these studies connect forecasting quality, autoscaling behavior, and realistic cluster workloads while emphasizing different layers of that space. Table~\ref{tab:related-positioning} summarizes how the present study differs in data source, control linkage, and evidence surface.
+
+\begin{table*}[t]
+  \centering
+  \caption{Representative prior studies on cluster forecasting and autoscaling.}
+  \label{tab:related-positioning}
+  \scriptsize
+  \begin{tabular}{p{2.8cm}p{1.8cm}p{1.1cm}p{1.3cm}p{4.0cm}}
+    \toprule
+    Paper & Data & Forecast & Policy link & Relevance to the present study \\
+    \midrule
+    Dinda and O'Hallaron~\citep{Dinda2000HostLoad} & Cluster host traces & Yes & No & Establishes early forecasting baselines at the cluster-host level. \\
+    Casalicchio~\citep{Casalicchio2019ContainerAutoscaling} & Container experiments & Limited & Yes & Shows that metric choice and autoscaling behavior need to be evaluated together. \\
+    Rossi et al.~\citep{Rossi2025UncertaintyAwareForecasting} & Google and Alibaba traces & Yes & Service-level analysis & Demonstrates the relevance of uncertainty-aware forecasting and transfer analysis on public traces. \\
+    Present study & Alibaba public trace & Yes & Yes & Couples forecasting, transfer, and trace-driven control under one reproducible public-trace pipeline. \\
+    \bottomrule
+  \end{tabular}
+\end{table*}
+
+\subsection{Trace-driven workload characterization}
+
+Public cluster traces are essential because they allow researchers to evaluate scheduling and resource-management ideas under realistic temporal variation. Google cluster traces played this role for earlier large-scale studies \citep{reiss2012google}. Alibaba later released several trace families that exposed co-located datacenter workloads, batch scheduling behavior, microservice metrics, and GPU-cluster behavior \citep{alibabaclusterdata2026}. Follow-up studies characterized co-located workloads in Alibaba cloud datacenters \citep{Jiang2022Characterizing}, examined resource-efficiency bottlenecks \citep{guo2019limits}, and analyzed large-scale microservice dependencies \citep{luo2021characterizing}. Recent cloud-evaluation work has also emphasized reproducible simulation and policy testing against realistic workloads and traces \citep{Canizares2023Simcan2Cloud}. These studies provide strong descriptive or evaluative evidence, but they do not by themselves close the loop between forecasting and operational scaling decisions.
+
+\subsection{Forecasting for cluster and cloud workloads}
+
+Forecasting methods for systems workloads range from classical time-series models to neural sequence models. Empirical cloud-resource prediction has been studied with statistical and machine-learning methods for more than a decade \citep{islam2012empirical,Dinda2000HostLoad,Calheiros2015ARIMAWorkload}. Proactive provisioning studies then moved toward workload classification, multi-step forecasting, and explicit control relevance \citep{Herbst2014ProactiveProvisioning,Baldan2018WorkloadForecasting,Banerjee2021MultiStepPrediction}. Sequence-learning models such as LSTM \citep{hochreiter1997long,Song2017LSTMHostLoad} and more integrated deep-learning approaches \citep{Bi2021IntegratedDeepLearning} later became common choices for multistep forecasting. Probabilistic or quantile-aware forecasting is especially relevant for control problems because capacity decisions should respond not only to central tendency but also to uncertainty \citep{salinas2020deepar,lim2021temporal,Rossi2025UncertaintyAwareForecasting}. The practical challenge is not simply to achieve lower forecast error, but to expose decision-useful uncertainty without making the pipeline too heavy to reproduce.
+
+\subsection{Predictive autoscaling and uncertainty-aware control}
+
+Autoscaling has a long literature in cloud and grid computing, spanning threshold rules, control-theoretic policies, queuing-based methods, and predictive approaches \citep{lorido2014review,Mao2010DeadlineBudgetAutoscaling}. Container-era systems added new operational layers, including orchestration concerns \citep{Bernstein2014ContainersCloud,Burns2016BorgKubernetes}, proactive traffic-aware scaling \citep{Kim2017ProactiveAutoscaling}, and Docker-specific elasticity mechanisms \citep{AlDhuraibi2017ElasticDocker}. More recent service-granular studies examine resource management and cost-aware autoscaling directly at the microservice level \citep{ZargarAzad2023MicroserviceFramework,Puebla2024CdaScaler}, while framework-oriented studies continue to integrate predictive models into end-to-end cloud autoscaling stacks and report operational gains under their target environments \citep{Zanussi2026LoadAwareAutoscaling}. The common appeal of predictive policies is that they can scale before demand surges, but the common risk is that forecast noise can trigger unstable actions. Uncertainty-aware cloud studies therefore remain relevant because they make safety margins explicit \citep{Minarolli2017UncertaintyPrediction,Rossi2025UncertaintyAwareForecasting}. For this reason, a forecasting paper that never evaluates control outcomes, or a control paper that treats forecasts as opaque oracles, leaves an important systems gap unresolved.
+
+\subsection{Transfer learning and generalization}
+
+Recent workload-prediction papers increasingly discuss generalization across workloads and deployment contexts. This includes transfer-learning surveys \citep{Weiss2016TransferLearning}, time-series transfer frameworks \citep{Ye2018TransferForecasting}, and cloud-specific transfer-learning models \citep{Liu2022TRPredictior,Hao2021TransferQoS}. These studies make clear that generalization is already a substantive concern rather than an optional extension. That context matters for how the present study frames cross-machine transfer evidence and remaining limitations.
+
+\subsection{Position of the present study}
+
+The present study is positioned as an end-to-end public-trace evaluation rather than as a new autoscaling framework. Existing public-trace studies are often descriptive, forecasting studies frequently stop before policy evaluation, and predictive autoscaling studies often depend on private data or platform-specific implementations or emphasize positive framework-specific deployment results \citep{Zanussi2026LoadAwareAutoscaling}. The gap addressed here is a reproducible, trace-driven forecasting-to-control benchmark that can be evaluated end to end using public artifacts while making mixed and negative service-level findings explicit rather than hiding them.

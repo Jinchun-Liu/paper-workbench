@@ -1,0 +1,75 @@
+Let $e \in \mathcal{E}$ denote the managed entity under study. Depending on the experiment, $e$ may represent the aggregate cluster, an individual machine, or an application-level service identified by Alibaba's \texttt{app\_du}. For every entity, the time index is discretized to one-minute intervals. The observed demand signal is denoted by $x_{e,t} \in \mathbb{R}_{\ge 0}$.
+
+\paragraph{Entity-level forecasting objective.}
+Given a context window of length $L$, the forecasting layer receives
+\[
+\mathbf{x}_{e,t-L+1:t} = \{x_{e,t-L+1}, x_{e,t-L+2}, \dots, x_{e,t}\},
+\]
+and predicts future demand at horizons $\mathcal{H}=\{1,5,10\}$ minutes. For each $h \in \mathcal{H}$, the model produces at least two quantiles,
+\[
+\hat{x}^{(0.5)}_{e,t+h}, \qquad \hat{x}^{(0.9)}_{e,t+h},
+\]
+which correspond to the median and the upper decision quantile. The median supports conservative scale-in, while the upper quantile supports earlier scale-out under uncertainty.
+
+\paragraph{Demand representation.}
+The forecasting formulation is shared across all benchmarks, but the physical meaning of $x_{e,t}$ depends on the entity type. For aggregate and machine-level experiments, $x_{e,t}$ is the observed CPU-utilization signal after one-minute aggregation. For service-level experiments, $x_{e,t}$ is a CPU-core demand proxy obtained by aggregating container-level rows that belong to the same \texttt{app\_du} and summing
+\[
+\text{cpu\_request\_cores} \times \text{cpu\_utilization}.
+\]
+This keeps the forecasting route consistent while allowing the control layer to operate on service-relevant load units.
+
+\paragraph{Required-capacity mapping.}
+The controller acts on a required-capacity signal rather than on the raw forecast. For aggregate and machine-level experiments, the observed demand is first normalized to the policy capacity space and then converted into a minimum required capacity
+\[
+c^\star_{e,t} = \max\left((1+\rho)\tilde{x}_{e,t},\; c_{\min}\right),
+\]
+where $\rho$ is the headroom ratio, $\tilde{x}_{e,t}$ is normalized demand, and $c_{\min}$ is the minimum capacity floor.
+
+For service-level experiments, the same logic is expressed in replica-equivalent units. Let $r_e$ denote the median per-container requested CPU cores for service $e$. The required replica-equivalent capacity becomes
+\[
+c^\star_{e,t} = \max\left((1+\rho)\frac{x_{e,t}}{r_e},\; c_{\min}\right).
+\]
+This mapping is important because it places reactive, lagged-tracking, and predictive service policies in the same decision space.
+
+\paragraph{Reactive baseline.}
+The reactive policy is threshold-based. If the current utilization exceeds an upper threshold, capacity is increased by at most one step. If utilization falls below a lower threshold, capacity is decreased by at most one step. This approximates the structure of common threshold-driven elasticity controllers and serves as the operational baseline.
+
+\paragraph{Lagged target-tracking baseline.}
+The second policy baseline is forecast-free but more explicit than threshold control. It drives the next action directly toward the previous-step required capacity:
+\[
+\begin{aligned}
+c_{e,t+1} = \max\Bigl(&c_{\min},\\
+&c_{e,t} + \mathrm{clip}(c^\star_{e,t} - c_{e,t}, -\Delta, \Delta)\Bigr).
+\end{aligned}
+\]
+This policy uses the same minimum-capacity floor and maximum single-step change as the predictive controller, but it has no access to future uncertainty and therefore tests whether naive target chasing is already sufficient.
+
+\paragraph{Predictive policy.}
+The predictive controller consumes the two quantile forecasts after mapping them into the same required-capacity space as the reactive and lagged baselines. Scale-out decisions use the upper quantile together with an explicit scale-out margin, while scale-in decisions use the median together with a safety margin and a cooldown constraint:
+{\small
+\[
+\begin{aligned}
+c_{e,t+1} &= \min(c_{e,t} + \Delta, \hat{c}^{(0.9)}_{e,t+h}),
+&& \text{if scale-out},\\
+c_{e,t+1} &= \max(c_{e,t} - \Delta,
+  (1+\gamma)\hat{c}^{(0.5)}_{e,t+h}),
+&& \text{if scale-in},\\
+c_{e,t+1} &= c_{e,t},
+&& \text{otherwise}.
+\end{aligned}
+\]
+}
+where $\Delta$ is the maximum single-step change and $\gamma$ is the scale-in safety margin. Cooldown suppresses oscillatory scale-in without delaying urgent scale-out.
+
+\paragraph{Forecasting backbone.}
+The proposed model family is framed as an uncertainty-aware multi-scale temporal forecaster. In the present experiments, that interface is instantiated by \texttt{UA-MSTCN-Lite}, a trainable multi-scale quantile-forest surrogate that emits $P50$ and $P90$ forecasts without introducing a heavyweight deep-learning dependency stack. The surrounding dataset contract, policy simulator, and evaluation protocol are kept stable so that a deeper temporal backbone can replace this surrogate in later revisions without changing the rest of the study design.
+
+\paragraph{Calibration objective.}
+Because the controller consumes quantiles rather than only point forecasts, the evaluation also measures empirical coverage:
+\[
+\mathrm{cov}^{(q)}_{e,h} = \frac{1}{N}\sum_{i=1}^{N}\mathbb{I}\left(x_{e,t_i+h} \le \hat{x}^{(q)}_{e,t_i+h}\right),
+\]
+where $q \in \{0.5, 0.9\}$. Ideally, $P50$ and $P90$ coverage should remain close to 0.5 and 0.9, respectively. Interval width $\hat{x}^{(0.9)}_{e,t+h} - \hat{x}^{(0.5)}_{e,t+h}$ is tracked alongside coverage because overly wide intervals may protect SLA at the cost of resource efficiency.
+
+\paragraph{Optimization targets.}
+Forecasting quality is evaluated with MAE, RMSE, MAPE, and pinball-oriented quantile diagnostics. Control quality is evaluated with SLA violation rate, over-provisioning, under-provisioning, scaling-action count, and average reserved capacity. This two-layer evaluation is central to the paper because lower forecast error alone does not imply better autoscaling decisions.

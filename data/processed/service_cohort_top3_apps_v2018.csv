@@ -1,0 +1,4 @@
+app_du,unique_containers,mean_cpu_request_cores,median_cpu_request_cores,mean_mem_size,min_ts,max_ts,container_events,machines,span_seconds
+app_1596,629,4.0,4.0,1.56,0,678827,3261,629,678827
+app_7876,513,8.0,8.0,3.13,0,686011,1885,513,686011
+app_141,490,8.0,8.0,3.13,0,678050,2774,490,678050

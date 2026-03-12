@@ -1,0 +1,41 @@
+dataset:
+  input_tar: paper-workbench/data/raw/machine_usage.tar.gz
+  output_series_csv: paper-workbench/data/processed/cluster_series_v2018.csv
+  required_columns:
+    - time_stamp
+    - machine_id
+    - cpu_util_percent
+    - mem_util_percent
+  resample_seconds: 60
+
+forecast:
+  context_window: 60
+  horizons:
+    - 1
+    - 5
+    - 10
+  train_ratio: 0.70
+  valid_ratio: 0.15
+  test_ratio: 0.15
+  baseline_models:
+    - persistence
+    - moving_average
+    - linear_regression
+    - random_forest
+    - mlp_regressor
+
+policy:
+  capacity_unit: 1.0
+  headroom_ratio: 0.15
+  scale_out_quantile_margin: 0.10
+  scale_in_safety_margin: 0.05
+  min_capacity: 0.20
+  cooldown_steps: 8
+  max_step_change: 0.10
+  reactive_upper_threshold: 0.80
+  reactive_lower_threshold: 0.45
+
+output:
+  metrics_csv: paper-workbench/experiments/results/metrics.csv
+  forecast_dir: paper-workbench/experiments/results/figures
+  tables_dir: paper-workbench/experiments/results/tables

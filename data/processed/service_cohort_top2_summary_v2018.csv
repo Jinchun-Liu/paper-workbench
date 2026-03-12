@@ -1,0 +1,3 @@
+app_du,observed_minutes,coverage_ratio,imputed_ratio,mean_active_container_count,mean_service_cpu_used_cores_proxy,peak_service_cpu_used_cores_proxy,global_minute_start,global_minute_end,global_span_minutes,selected_containers,mean_container_request_cores,median_container_request_cores,mean_container_mem_size,unique_containers,span_seconds
+app_141,11205,0.97265625,0.02734375,223.53802083333332,432.49534816743835,810.54,1440,12959,11520,490,8.0,8.0,3.13,490,678050
+app_7876,11204,0.9725694444444445,0.027430555555555555,149.00086805555554,62.200391338734576,1046.6333333333334,1440,12959,11520,513,8.0,8.0,3.13,513,686011

@@ -1,0 +1,17 @@
+cohort_label,scope,horizon,rank,model_name,mean_mae
+top10,overall_ranking,all,1,ua_mstcn_lite_quantile_forest,7.421574916115684
+top10,overall_ranking,all,2,random_forest,7.47518320777661
+top10,overall_ranking,all,3,linear_regression,7.762314085808839
+top10,overall_ranking,all,4,persistence,8.176002123978975
+top10,overall_ranking,all,5,mlp_regressor,8.511101381582852
+top10,horizon_winner,1,1,linear_regression,5.665529808975228
+top10,horizon_winner,5,1,ua_mstcn_lite_quantile_forest,7.406946178229456
+top10,horizon_winner,10,1,random_forest,8.1251384663468
+broad,overall_ranking,all,1,linear_regression,32.570520874606736
+broad,overall_ranking,all,2,persistence,33.38126270576519
+broad,overall_ranking,all,3,random_forest,36.31907352988326
+broad,overall_ranking,all,4,mlp_regressor,37.06556374767657
+broad,overall_ranking,all,5,ua_mstcn_lite_quantile_forest,37.7870811179408
+broad,horizon_winner,1,1,linear_regression,19.999104432897326
+broad,horizon_winner,5,1,linear_regression,34.24969445747051
+broad,horizon_winner,10,1,linear_regression,43.46276373345237

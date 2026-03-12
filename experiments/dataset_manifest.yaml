@@ -1,0 +1,45 @@
+dataset_name: alibaba-cluster-trace-v2018
+source_url: https://github.com/alibaba/clusterdata/tree/master/cluster-trace-v2018
+license_or_terms: research_or_study_use_as_described_by_alibaba_cluster_trace_program
+raw_files:
+  - machine_meta.tar.gz
+  - machine_usage.tar.gz
+  - container_meta.tar.gz
+  - container_usage.tar.gz_local_full_mirror
+time_granularity: 60s_after_resampling
+selected_signals:
+  - cluster_cpu_utilization_mean
+  - cluster_memory_utilization_mean
+  - active_machine_count
+  - machine_level_cpu_utilization_mean_for_top12_high_coverage_entities
+  - machine_level_memory_utilization_mean_for_top12_high_coverage_entities
+  - service_cpu_used_cores_proxy_for_selected_app_du_groups
+  - service_cpu_utilization_mean_for_selected_app_du_groups
+  - active_container_count_for_selected_app_du_groups
+preprocessing_steps:
+  - stream_csv_from_tar
+  - retain_required_columns
+  - drop_invalid_rows
+  - aggregate_to_timestamp
+  - resample_to_one_minute
+  - select_top12_machines_by_row_count
+  - reindex_selected_machines_to_global_minute_span
+  - interpolate_missing_minutes_for_selected_machines
+  - read_container_meta_and_map_container_to_app_du
+  - prefilter_app_du_by_meta_span_and_container_count
+  - full_profile_container_usage_for_candidate_app_du_groups
+  - filter_app_du_by_container_hit_ratio
+  - reindex_selected_services_to_global_minute_span
+  - aggregate_container_rows_to_one_minute_service_series
+  - compute_service_cpu_used_cores_proxy_from_request_cores_and_utilization
+  - derive_headroom_proxy
+split_strategy: chronological_70_15_15
+notes:
+  - The current pass combines aggregate, machine-level, transfer, and broad service-level evidence.
+  - Machine-cohort extension now covers 12 high-coverage machines with explicit imputation flags.
+  - Cross-machine transfer is evaluated with 3 deterministic folds over the same top-12 cohort.
+  - The broad service-level cohort is built from a verified local full mirror of container_usage.tar.gz.
+  - The current verified broad cohort covers 139 app_du groups, 19,419 selected containers, and 19,269 matched containers, with mean observed-minute coverage about 97.27% and mean container hit ratio about 99.32%.
+  - All 10 services from the earlier top-10 cohort are retained in the broad overlap audit.
+  - Promotion audit elevates the broad cohort to the main service-level result because the forecasting winner flips to linear regression, the equal-weighted scaling-actions delta becomes a stable degradation, and the mean over-provisioning reduction is not stable under paired service bootstrap.
+  - Service-level stability analysis resamples services, reports equal-weighted mean deltas as the primary statistic, and reports load-weighted mean deltas as an auxiliary check.

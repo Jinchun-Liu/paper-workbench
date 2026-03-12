@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this reproducibility package, please cite the manuscript and reference the frozen review package version."
+title: "Trace-Driven Proactive Autoscaling for Cluster Workloads via Multi-Horizon Forecasting"
+version: "review-freeze-2026-03-12"
+date-released: 2026-03-12
+type: software
+authors:
+  - family-names: Liu
+    given-names: Jinchun
+    email: ljc20041122@qq.com
+keywords:
+  - cluster computing
+  - workload forecasting
+  - proactive autoscaling
+  - Alibaba trace
+  - reproducibility
+abstract: >
+  Reproducibility package for a trace-driven forecasting-to-control benchmark on
+  Alibaba public cluster traces, including manuscript sources, processed
+  datasets, experiment scripts, and verified result artifacts.

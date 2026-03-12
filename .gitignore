@@ -1,0 +1,27 @@
+.DS_Store
+**/.DS_Store
+
+# Third-party raw archives are not redistributed via GitHub.
+data/raw/
+
+# Local staged review-freeze copies are distributed as release assets instead.
+submission/frozen-package/
+
+# GitHub hard file-size cap: keep oversized processed CSVs in the release asset.
+data/processed/service_cohort_broad_v2018.csv
+data/processed/service_cohort_top2_filtered_partial_v2018.csv
+data/processed/service_cohort_top3_filtered_container_usage.csv
+
+# Python cache noise.
+**/__pycache__/
+**/*.pyc
+
+# Transient LaTeX build outputs.
+manuscript/*.aux
+manuscript/*.bbl
+manuscript/*.blg
+manuscript/*.fdb_latexmk
+manuscript/*.fls
+manuscript/*.log
+manuscript/*.out
+manuscript/*.synctex.gz
