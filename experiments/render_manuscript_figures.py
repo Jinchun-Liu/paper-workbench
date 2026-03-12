@@ -286,8 +286,8 @@ def render_latency_tradeoff(metrics_df: pd.DataFrame, path: Path) -> None:
         "persistence": (6, 4, "left"),
         "linear_regression": (6, 4, "left"),
         "mlp_regressor": (6, 4, "left"),
-        "ua_mstcn_lite_quantile_forest": (6, 4, "left"),
-        "random_forest": (-8, -2, "right"),
+        "ua_mstcn_lite_quantile_forest": (-10, 8, "right"),
+        "random_forest": (-10, -6, "right"),
     }
     for _, row in summary.iterrows():
         offset_x, offset_y, ha = x_offsets.get(row["model_name"], (6, 4, "left"))
