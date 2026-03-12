@@ -16,7 +16,7 @@ The concrete package manifest used to stage this bundle is stored at `submission
 
 ## Review Access
 
-During peer review, the frozen package can be supplied to the editor and reviewers on request so that the manuscript numbers, figures, and service-cohort artifacts can be audited against the submitted version.
+During peer review, the submitted version is maintained in a private GitHub review repository together with the frozen review-freeze package. Access can be granted to the editor and reviewers so that the manuscript numbers, figures, and service-cohort artifacts can be audited against the submitted version without exposing the repository publicly before a final publication decision.
 
 ## Public Release Plan
 
