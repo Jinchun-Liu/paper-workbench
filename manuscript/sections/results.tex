@@ -282,6 +282,8 @@ At service level, \texttt{UA-MSTCN-Lite} still provides usable upper quantiles: 
 
 The service-level control comparison is stricter because demand is heterogeneous. Averaged over 139 services, lagged target tracking lowers over-provisioning to 3.848 but raises SLA violation to 0.486 and actions to 1660.9. Relative to reactive control, the predictive policy raises mean SLA violation from 0.0173 to 0.0311 and actions from 249.0 to 399.4, while mean over-provisioning falls from 56.310 to 53.677.
 
+A full 139-service QLR broad run provides the requested simpler uncertainty-aware service check. Its mean MAE is 19.207, 32.959, and 42.095 at the 1-, 5-, and 10-minute horizons; raw $P90/P50$ crossings are recorded (8{,}963 total), and guarded crossings are zero. In service policy, QLR predictive control has mean SLA violation 0.0206 versus 0.0173 for reactive control, mean over-provisioning 54.706 versus 56.310, and 382.0 actions versus 249.0. This confirms the service-level boundary: simpler quantile uncertainty reduces average over-provisioning but still worsens SLA and actions relative to reactive control.
+
 The paired service bootstrap fixes the headline. Predictive-minus-reactive SLA delta is +0.0138 with 95\% interval [0.0035, 0.0271], and scaling-actions delta is +150.4 with interval [114.0, 185.0], so both degradations are stable. Over-provisioning differs: the mean delta is -2.633, but its interval [-6.953, 2.328] crosses zero. The auxiliary load-weighted action delta is nearly zero (-0.567 with interval [-64.257, 68.245]), indicating that the equal-weighted action penalty comes mainly from many smaller services rather than the highest-load services alone.
 
 Figure~\ref{fig:service-policy-delta-distribution} shows the same heterogeneity: SLA and action deltas stay positive through most service ranks, while over-provisioning straddles zero for many services.
@@ -357,7 +359,7 @@ Table~\ref{tab:policy-results} summarizes aggregate control. Reactive control ac
   \end{tabular}
 \end{table}
 
-Using QLR as the predictive uncertainty source gives the same aggregate boundary: SLA violation 0.034, over-provisioning 0.147, and 587 actions at the 5-minute horizon. QLR is safer than lagged target tracking but worse than reactive control on SLA and actions, and it is not treated as a full 139-service result.
+Using QLR as the predictive uncertainty source gives the same aggregate boundary: SLA violation 0.034, over-provisioning 0.147, and 587 actions at the 5-minute horizon. QLR is safer than lagged target tracking but worse than reactive control on SLA and actions.
 
 \begin{figure}[htbp]
   \centering
