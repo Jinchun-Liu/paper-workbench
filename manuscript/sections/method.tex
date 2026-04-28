@@ -27,7 +27,7 @@ where $\rho$ is the headroom ratio, $\tilde{x}_{e,t}$ is normalized demand, and 
 
 For service-level experiments, the same logic is expressed in replica-equivalent units. The required replica-equivalent capacity becomes
 \[
-c^\star_{e,t} = \max\left((1+\rho)\frac{x_{e,t}}{r_e},\; c_{\min}\right).
+c^\star_{e,t} = \max\left(\frac{(1+\rho)x_{e,t}}{r_e},\; c_{\min}\right),
 \]
 where $r_e$ is the median per-container requested CPU cores for service $e$.
 This mapping is important because it places reactive, lagged-tracking, and predictive service policies in the same decision space.
