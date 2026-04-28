@@ -1061,8 +1061,8 @@ conda run -n paper-tcn python scripts\build_submission_package.py --manifest sub
 - source_package_refresh:
   - Build-script clean-dir `latexmk` verification passed.
   - Independent zip-extraction `latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex` verification passed.
-  - Source zip SHA256: `C60F83FB1E00D15A8340DED74C8E3C3CE083B2EE866476EADCD5A8682B2275D7`.
-  - Source zip size: `2914975` bytes.
+  - Source zip SHA256 after final service-capacity equation polish: `FF775B268C4C0596586AB29B4CE0BC10FFA3EC4B6EFF9323A05F1BF206D3F97F`.
+  - Source zip size after final service-capacity equation polish: `2914976` bytes.
 - final_qa:
   - Current manuscript and response-letter sources contain `https://github.com/Jinchun-Liu/paper-workbench`.
   - Current manuscript and response-letter sources no longer contain the prior R1.2 partial-adoption wording.

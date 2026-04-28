@@ -57,7 +57,7 @@ Upload these as supplementary/reproducibility files if the portal requests exper
 
 - `manuscript/main.pdf`: 18 pages after the final concision and figure-readability pass, within the 20-page cap.
 - `revisions/response-letter.pdf`: 8 pages.
-- `submission/source-package/cluster-computing.zip`: rebuilt and clean-dir verified after the Reviewer 1 public-repository URL update; SHA256 `C60F83FB1E00D15A8340DED74C8E3C3CE083B2EE866476EADCD5A8682B2275D7`; size `2914975` bytes; `31` zip entries including `17` figure assets and no PDF/LaTeX intermediate files.
+- `submission/source-package/cluster-computing.zip`: rebuilt and clean-dir verified after the Reviewer 1 public-repository URL update and final service-capacity equation polish; SHA256 `FF775B268C4C0596586AB29B4CE0BC10FFA3EC4B6EFF9323A05F1BF206D3F97F`; size `2914976` bytes; `31` zip entries including `17` figure assets and no PDF/LaTeX intermediate files.
 - `metrics.csv` SHA256 remains `0FA3FDB810CA0A0F74592D3ADC92102C7A0CA67EA02C2B8C8F22435537F873AB`.
 - `experiments/results/qlr_service_broad/` now exists, passed gate, and contains the approved full 139-service QLR artifacts.
 - `experiments/results/full_ua_mstcn_smoke/` now exists and contains Stage 1 smoke-only artifacts.
