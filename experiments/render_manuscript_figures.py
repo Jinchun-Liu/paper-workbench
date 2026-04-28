@@ -31,9 +31,12 @@ def split_series(series: np.ndarray, train_ratio: float, valid_ratio: float) -> 
     return train, test
 
 
-def save_figure(fig: plt.Figure, path: Path) -> None:
+def save_figure(fig: plt.Figure, path: Path, *, tight_rect: tuple[float, float, float, float] | None = None) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    fig.tight_layout()
+    if tight_rect is None:
+        fig.tight_layout()
+    else:
+        fig.tight_layout(rect=tight_rect)
     fig.savefig(path, dpi=220, bbox_inches="tight")
     plt.close(fig)
 
@@ -216,7 +219,7 @@ def render_case_study(
         "UA-MSTCN-Lite": "#8b1e3f",
     }
 
-    fig, axes = plt.subplots(len(horizons), 1, figsize=(10.5, 8.5), sharex=False)
+    fig, axes = plt.subplots(len(horizons), 1, figsize=(6.4, 7.6), sharex=False)
     start = 220
     window = 180
     for ax, horizon in zip(axes, horizons):
@@ -244,9 +247,10 @@ def render_case_study(
             linewidth=1.2,
             label="UA-MSTCN-Lite",
         )
-        ax.set_title(f"Case study at {horizon}-minute horizon")
-        ax.set_ylabel("CPU utilization (%)")
+        ax.set_title(f"Case study at {horizon}-minute horizon", fontsize=12)
+        ax.set_ylabel("CPU utilization (%)", fontsize=11)
         ax.grid(alpha=0.15, linewidth=0.5)
+        ax.tick_params(axis="both", labelsize=10)
         plotted = [actual[start:end], ua_predictions_arr[start:end]]
         plotted.extend(output.y_pred[start:end] for output in model_outputs.values())
         y_min = min(float(np.min(series_slice)) for series_slice in plotted)
@@ -254,21 +258,26 @@ def render_case_study(
         y_pad = max(2.0, 0.20 * (y_max - y_min))
         ax.set_ylim(y_min - y_pad * 0.35, y_max + y_pad)
 
-    axes[-1].set_xlabel("Aligned test-step index")
+    axes[-1].set_xlabel("Aligned test-step index", fontsize=11)
     handles, labels = axes[0].get_legend_handles_labels()
-    axes[0].legend(handles, labels, frameon=False, ncols=5, loc="upper center", bbox_to_anchor=(0.63, 1.02))
+    fig.legend(
+        handles,
+        labels,
+        frameon=False,
+        ncols=5,
+        loc="upper center",
+        bbox_to_anchor=(0.5, 0.995),
+        fontsize=9,
+        handlelength=2.1,
+        columnspacing=0.9,
+        borderaxespad=0.0,
+    )
 
-    save_figure(fig, path)
+    save_figure(fig, path, tight_rect=(0.0, 0.0, 1.0, 0.94))
 
 
 def render_latency_tradeoff(metrics_df: pd.DataFrame, path: Path) -> None:
     forecast_df = metrics_df[metrics_df["policy_name"].fillna("") == ""].copy()
-    summary = (
-        forecast_df.groupby("model_name")[["mae", "latency_ms"]]
-        .mean()
-        .reset_index()
-        .sort_values("mae")
-    )
     display_names = {
         "persistence": "Persistence",
         "moving_average": "Moving avg.",
@@ -277,9 +286,16 @@ def render_latency_tradeoff(metrics_df: pd.DataFrame, path: Path) -> None:
         "mlp_regressor": "MLP",
         "ua_mstcn_lite_quantile_forest": "UA-MSTCN-Lite",
     }
+    forecast_df = forecast_df[forecast_df["model_name"].isin(display_names)].copy()
+    summary = (
+        forecast_df.groupby("model_name")[["mae", "latency_ms"]]
+        .mean()
+        .reset_index()
+        .sort_values("mae")
+    )
 
-    fig, ax = plt.subplots(figsize=(7.5, 4.8))
-    ax.scatter(summary["latency_ms"], summary["mae"], s=90, color="#0f7b6c")
+    fig, ax = plt.subplots(figsize=(5.8, 4.4))
+    ax.scatter(summary["latency_ms"], summary["mae"], s=105, color="#0f7b6c")
     x_max = float(summary["latency_ms"].max())
     x_offsets = {
         "moving_average": (6, 4, "left"),
@@ -299,14 +315,15 @@ def render_latency_tradeoff(metrics_df: pd.DataFrame, path: Path) -> None:
             textcoords="offset points",
             xytext=(offset_x, offset_y),
             ha=ha,
-            fontsize=9,
+            fontsize=11,
         )
     ax.set_xscale("log")
     ax.set_xlim(float(summary["latency_ms"].min()) * 0.75, x_max * 1.65)
     ax.set_ylim(float(summary["mae"].min()) - 0.03, float(summary["mae"].max()) + 0.05)
-    ax.set_xlabel("Average runtime per benchmark call (ms, log scale)")
-    ax.set_ylabel("Average MAE across horizons")
-    ax.set_title("Accuracy-latency trade-off")
+    ax.set_xlabel("Average runtime per benchmark call (ms, log scale)", fontsize=11)
+    ax.set_ylabel("Average MAE across horizons", fontsize=11)
+    ax.set_title("Accuracy-latency trade-off", fontsize=13)
+    ax.tick_params(axis="both", labelsize=10)
     ax.grid(alpha=0.15, linewidth=0.5)
 
     save_figure(fig, path)

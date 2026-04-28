@@ -1,0 +1,19 @@
+# Full UA-MSTCN Broad Report
+
+- run_id: `full_ua_mstcn_broad_20260428`
+- status: `pass`
+- service_count: `139`
+- test split use: held-out evaluation only; fitting uses train prefix and calibration/early stopping uses validation prefix.
+- metrics_csv_hash_before: `0fa3fdb810ca0a0f74592d3adc92102c7a0ca67ea02c2b8c8f22435537f873ab`
+- metrics_csv_hash_after: `0fa3fdb810ca0a0f74592d3adc92102c7a0ca67ea02c2b8c8f22435537f873ab`
+
+## Gate Result
+
+- PASS: broad Full UA-MSTCN gate passed.
+
+## Resource Trace
+
+```csv
+run_id,scope,model_name,entity_count,entities,train_windows,validation_windows,hidden_width,dilations,batch_size,max_epochs,epochs_completed,train_runtime_seconds,total_runtime_seconds,mean_epoch_seconds,first_train_loss,last_train_loss,first_valid_loss,best_valid_loss,last_valid_loss,peak_cuda_memory_bytes,process_memory_rss_bytes
+full_ua_mstcn_broad_20260428,service_broad,full_ua_mstcn_broad,139,app_1063;app_1215;app_1254;app_1276;app_141;app_1499;app_1552;app_1658;app_1675;app_17;app_1797;app_1825;app_1826;app_2024;app_2128;app_2241;app_2264;app_2296;app_2324;app_2497;app_2557;app_263;app_2660;app_2695;app_2754;app_2819;app_2856;app_2895;app_2899;app_2965;app_2989;app_3073;app_3136;app_3183;app_3238;app_3275;app_3422;app_3472;app_3511;app_3514;app_3632;app_3641;app_3665;app_3707;app_3715;app_3755;app_3924;app_3979;app_3988;app_4038;app_4077;app_4142;app_4220;app_4265;app_4353;app_4371;app_442;app_4456;app_4474;app_4483;app_459;app_460;app_4619;app_4650;app_4799;app_4812;app_4832;app_484;app_498;app_5029;app_5035;app_5102;app_512;app_5159;app_521;app_5420;app_5428;app_5546;app_559;app_56;app_565;app_5652;app_5657;app_5729;app_5732;app_5805;app_582;app_5877;app_5884;app_5895;app_5936;app_6026;app_6034;app_6140;app_6217;app_647;app_6491;app_6593;app_6597;app_66;app_6651;app_6658;app_6763;app_6791;app_6911;app_7048;app_7073;app_7227;app_7264;app_732;app_7414;app_7419;app_7475;app_7505;app_7766;app_7791;app_7876;app_7890;app_7908;app_8205;app_8274;app_8360;app_8492;app_8532;app_8661;app_8719;app_8727;app_8775;app_8832;app_888;app_8981;app_9030;app_9081;app_9352;app_9529;app_9541;app_9678;app_9733;app_9741,1111166,230740,64,1;2;4;8;16,1024,20,20,755.8690445000102,1054.3397919999989,37.79345222500051,0.06344770499493096,0.04911760120733228,0.1216203941330811,0.08714439824883524,0.09009580325706276,891226624,5566631936
+```

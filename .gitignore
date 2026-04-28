@@ -25,3 +25,27 @@ manuscript/*.fls
 manuscript/*.log
 manuscript/*.out
 manuscript/*.synctex.gz
+
+# Revision response LaTeX intermediates.
+revisions/*.aux
+revisions/*.fdb_latexmk
+revisions/*.fls
+revisions/*.log
+revisions/*.out
+
+# Local submission staging and visual QA exports.
+submission/source-package/
+submission/qa-pages/
+
+# Large per-timestep experiment traces are retained locally or as release assets,
+# not in normal Git history.
+experiments/results/**/full_ua_mstcn_*_predictions.csv
+experiments/results/**/full_ua_mstcn_*_policy_series.csv
+experiments/results/**/service_qlr_predictions.csv
+experiments/results/**/service_qlr_policy_series.csv
+experiments/results/**/aggregate_qlr_predictions.csv
+experiments/results/qlr_aggregate_full/aggregate_qlr_policy_series.csv
+experiments/results/**/*_run_logs/
+experiments/results/**/stdout.log
+experiments/results/**/stderr.log
+experiments/results/**/pid.txt

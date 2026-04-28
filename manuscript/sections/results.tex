@@ -1,15 +1,13 @@
-The manuscript now reports leakage-free forecasting results, uncertainty-calibration checks, cross-entity transfer checks, broad service-level evidence from official container traces, and a calibrated control comparison based on a trainable uncertainty-aware surrogate. The evidence is strong enough for a multi-granularity discussion, while still leaving room for service-aware tuning and stronger deep temporal models.
+The results report leakage-free forecasting, calibration, transfer, service-level evidence, and control outcomes. They support a boundary-mapping claim rather than a universal model-improvement claim.
 
 \subsection{Forecasting benchmark}
 
-The experimental pipeline includes a reproducible downloader for Alibaba \texttt{v2018} artifacts, a preprocessing route that builds a one-minute aggregate workload series from the compressed trace, baseline forecasters, a trainable \texttt{UA-MSTCN-Lite} surrogate, and a predictive-versus-reactive policy simulator. Most importantly, the reported metrics are computed on 11{,}208 aggregate samples rather than on placeholder values.
-
-Table~\ref{tab:forecast-smoke-test} summarizes aggregate forecasting results under the leakage-free split. Linear regression provides the best average MAE across the three horizons (3.514), random forest is a close second (3.529), and \texttt{UA-MSTCN-Lite} remains competitive rather than dominant (3.548 average MAE). The standard neural MLP baseline improves over persistence and moving average, but its average MAE of 3.708 does not overturn the linear-tree ranking. At the 10-minute horizon, the gap between linear regression and \texttt{UA-MSTCN-Lite} is only 0.0013 MAE, which is small enough to treat the two models as practically tied on this aggregate signal. The aggregate benchmark therefore shows that the uncertainty-aware surrogate can still support the control study even when it is not the strongest point forecaster.
+Table~\ref{tab:forecast-leakage-free} summarizes aggregate forecasting on 11{,}208 held-out samples. Linear regression has the best average MAE (3.514), random forest is close (3.529), and \texttt{UA-MSTCN-Lite} remains competitive rather than dominant (3.548). The MLP improves over simple heuristics but does not change the ranking. At the 10-minute horizon, linear regression and \texttt{UA-MSTCN-Lite} differ by only 0.0013 MAE, so the aggregate result supports using the surrogate for control while rejecting a point-forecast superiority claim.
 
 \begin{table}[htbp]
   \centering
-  \caption{Verified smoke-test forecasting performance on the aggregate cluster series.}
-  \label{tab:forecast-smoke-test}
+  \caption{Leakage-free forecasting performance on the aggregate cluster series (MAE, RMSE, MAPE).}
+  \label{tab:forecast-leakage-free}
   \scriptsize
   \setlength{\tabcolsep}{2pt}
   \renewcommand{\arraystretch}{0.96}
@@ -39,6 +37,26 @@ Table~\ref{tab:forecast-smoke-test} summarizes aggregate forecasting results und
   \end{tabular}
 \end{table}
 
+Table~\ref{tab:aggregate-qlr-baseline} adds the reviewer-requested QLR baseline, fitted only on the train-plus-validation prefix and evaluated only on the test segment. QLR is competitive at the 1- and 5-minute horizons, but it is used as an auditable uncertainty baseline rather than a new superiority claim. Raw and guarded $P90$ outputs are retained, with zero raw and guarded crossings in the aggregate run.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Aggregate quantile linear regression baseline on the held-out test split.}
+  \label{tab:aggregate-qlr-baseline}
+  \scriptsize
+  \setlength{\tabcolsep}{2pt}
+  \renewcommand{\arraystretch}{0.96}
+  \begin{tabular}{lccccc}
+    \toprule
+    Model & H & MAE & RMSE & $P90$ cov. & Raw crosses \\
+    \midrule
+    QLR & 1 & 2.265 & 3.145 & 0.900 & 0 \\
+    QLR & 5 & 3.967 & 5.390 & 0.883 & 0 \\
+    QLR & 10 & 4.315 & 5.861 & 0.886 & 0 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\linewidth]{../experiments/results/figures/baseline_mae_by_horizon.png}
@@ -48,27 +66,27 @@ Table~\ref{tab:forecast-smoke-test} summarizes aggregate forecasting results und
 
 \subsection{Case study and accuracy-runtime trade-off}
 
-Aggregate error tables alone do not show where the models succeed or fail. Figure~\ref{fig:forecast-case-study} therefore plots aligned slices from the test set at the 1-, 5-, and 10-minute horizons. The same pattern appears across horizons: persistence reacts too slowly when the workload turns, the MLP captures the broad trend but remains smoother around turning points, and random forest together with \texttt{UA-MSTCN-Lite} tracks the main shape more closely. The figure is still useful even though \texttt{UA-MSTCN-Lite} is no longer the best average point forecaster, because the controller consumes its quantile band rather than only its median prediction.
+Figure~\ref{fig:forecast-case-study} plots aligned test slices for the 1-, 5-, and 10-minute horizons. Persistence lags at turns, the MLP smooths turning points, and random forest and \texttt{UA-MSTCN-Lite} track the main shape more closely. The figure remains relevant because the controller consumes the surrogate's quantile band, not only its median.
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\linewidth]{../experiments/results/figures/forecast_case_study.png}
-  \caption{Forecast case study on aligned test slices for the 1-, 5-, and 10-minute horizons.}
+  \caption{Forecast case study on aligned test slices for the 1-, 5-, and 10-minute horizons, with persistence, linear regression, random forest, MLP regressor, and \texttt{UA-MSTCN-Lite} predictions overlaid.}
   \label{fig:forecast-case-study}
 \end{figure}
 
-Accuracy is not the only practical concern. Figure~\ref{fig:latency-tradeoff} shows the trade-off between average MAE and average wall-clock runtime per benchmark call on the current workstation. Linear regression is now the strongest average point predictor at 19.3 ms per benchmark call, the MLP baseline sits in the middle at about 630 ms per call, random forest is slightly better in MAE than MLP but over an order of magnitude slower, and \texttt{UA-MSTCN-Lite} stays close to random forest in average MAE while also producing calibrated uncertainty estimates. This observation matters because it separates two questions that are often conflated: which model is best for point forecasting, and which model exposes the uncertainty information needed by the controller.
+Figure~\ref{fig:latency-tradeoff} compares average MAE with runtime. Linear regression is strongest and fastest among the main point baselines at 19.3 ms per call; the MLP takes about 630 ms; random forest is slightly more accurate than MLP but much slower. \texttt{UA-MSTCN-Lite} stays close to random forest in MAE while adding quantile outputs, separating point accuracy from controller-facing uncertainty.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.82\linewidth]{../experiments/results/figures/forecast_latency_tradeoff.png}
+  \includegraphics[width=\linewidth]{../experiments/results/figures/forecast_latency_tradeoff.png}
   \caption{Average forecasting accuracy versus average runtime per benchmark call on the current workstation.}
   \label{fig:latency-tradeoff}
 \end{figure}
 
 \subsection{Context, regime, and calibration analysis}
 
-The aggregate route also includes three forecasting diagnostics. First, Figure~\ref{fig:context-sensitivity} shows the sensitivity of \texttt{UA-MSTCN-Lite} to the context window. A 60-minute window gives the best average MAE (3.548), compared with 3.615 for 30 minutes and 3.585 for 120 minutes. The result is modest rather than dramatic, but it is still useful because it shows the default context length is not arbitrary.
+Figure~\ref{fig:context-sensitivity} shows context-window sensitivity. A 60-minute window gives the best average MAE (3.548), compared with 3.615 for 30 minutes and 3.585 for 120 minutes.
 
 \begin{figure}[htbp]
   \centering
@@ -77,7 +95,7 @@ The aggregate route also includes three forecasting diagnostics. First, Figure~\
   \label{fig:context-sensitivity}
 \end{figure}
 
-Second, Figure~\ref{fig:regime-comparison} partitions the 5-minute horizon test set into stable, moderate, and bursty regimes according to recent local volatility. The result again argues for caution rather than overclaiming: \texttt{UA-MSTCN-Lite} is slightly better than random forest in the moderate regime (3.731 vs.\ 3.752 MAE), but slightly worse in the stable and bursty regimes. This regime split shows that the surrogate is not hiding a brittle failure mode behind a single mean score, and it identifies bursty demand as the regime that most clearly needs a stronger next-generation model.
+Figure~\ref{fig:regime-comparison} partitions the 5-minute test set by recent volatility. \texttt{UA-MSTCN-Lite} is slightly better than random forest in the moderate regime (3.731 vs.\ 3.752 MAE), but slightly worse in stable and bursty regimes, identifying bursty demand as the clearest target for a stronger model.
 
 \begin{figure}[htbp]
   \centering
@@ -86,7 +104,7 @@ Second, Figure~\ref{fig:regime-comparison} partitions the 5-minute horizon test 
   \label{fig:regime-comparison}
 \end{figure}
 
-Third, the uncertainty-aware surrogate is now evaluated directly through empirical quantile coverage. Table~\ref{tab:quantile-coverage} and Figure~\ref{fig:quantile-coverage} show that the median forecasts are well centered, with $P50$ coverage staying close to 0.5 across all horizons. The high quantile is slightly conservative at the 1-minute horizon (0.920 coverage) and mildly under-covered at the 5- and 10-minute horizons (0.867 and 0.868). This is a useful control-oriented result: the quantile band is credible enough to support a predictive policy, but the longer-horizon under-coverage explains why the controller still needs an explicit scale-out margin.
+Table~\ref{tab:quantile-coverage} and Figure~\ref{fig:quantile-coverage} evaluate quantile coverage. $P50$ stays close to 0.5, while $P90$ is conservative at 1 minute (0.920) and mildly under-covered at 5 and 10 minutes (0.867 and 0.868). The band is usable for control, but longer-horizon under-coverage justifies the explicit scale-out margin.
 
 \begin{table}[htbp]
   \centering
@@ -109,13 +127,13 @@ Third, the uncertainty-aware surrogate is now evaluated directly through empiric
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.72\linewidth]{../experiments/results/figures/quantile_coverage.png}
-  \caption{Empirical $P50$ and $P90$ coverage of \texttt{UA-MSTCN-Lite}. Dashed lines indicate the nominal target levels.}
+  \caption{Empirical $P50$ and $P90$ coverage of \texttt{UA-MSTCN-Lite}. Dashed lines indicate the nominal target levels of 0.5 ($P50$) and 0.9 ($P90$).}
   \label{fig:quantile-coverage}
 \end{figure}
 
 \subsection{Cross-entity machine-cohort benchmark}
 
-The aggregate trace is no longer the only evidence surface. A second benchmark extracted from 12 high-coverage machines tests whether the forecasting story changes once the unit of analysis shifts from one cluster-wide series to multiple long-lived entities. Table~\ref{tab:machine-cohort-summary} summarizes the average error across the cohort. The qualitative ranking is stable and, if anything, harsher on the surrogate than the aggregate benchmark: linear regression is the strongest point predictor at every horizon, with mean MAE values of 3.633, 5.520, and 5.966. The standard neural MLP baseline becomes the second-best average point predictor at all three horizons (3.921, 5.845, and 6.301), but it still trails linear regression by 0.29--0.34 MAE. \texttt{UA-MSTCN-Lite} remains close to random forest and now trails even the simple MLP baseline on this cohort.
+The 12-machine cohort tests whether the aggregate story survives a finer unit of analysis. Table~\ref{tab:machine-cohort-summary} shows the same direction, but more strongly: linear regression is the best point predictor at every horizon (MAE 3.633, 5.520, and 5.966), the MLP is second, and \texttt{UA-MSTCN-Lite} trails both MLP and random forest on this cohort.
 
 \begin{table}[htbp]
   \centering
@@ -147,7 +165,7 @@ The aggregate trace is no longer the only evidence surface. A second benchmark e
   \end{tabular}
 \end{table}
 
-Figure~\ref{fig:machine-cohort-mae} makes the same pattern easier to scan. Linear regression wins 6, 8, and 8 of the 12 entities at the 1-, 5-, and 10-minute horizons, respectively. The MLP baseline wins no machine-horizon cell, which shows that its gain over random forest and \texttt{UA-MSTCN-Lite} comes from broad but modest improvements rather than from dominant wins on specific entities. \texttt{UA-MSTCN-Lite} still wins only 2, 3, and 2 entities across these horizons. This is exactly the kind of result that should remain in the manuscript instead of being optimized away: it shows that the current surrogate is not yet the strongest general-purpose point forecaster when the workload granularity becomes finer.
+Figure~\ref{fig:machine-cohort-mae} shows the same pattern by entity. Linear regression wins 6, 8, and 8 of the 12 machines at the 1-, 5-, and 10-minute horizons; \texttt{UA-MSTCN-Lite} wins 2, 3, and 2. The current surrogate is therefore not the strongest general-purpose point forecaster at finer granularity.
 
 \begin{figure}[htbp]
   \centering
@@ -156,7 +174,7 @@ Figure~\ref{fig:machine-cohort-mae} makes the same pattern easier to scan. Linea
   \label{fig:machine-cohort-mae}
 \end{figure}
 
-Figure~\ref{fig:machine-cohort-entity} adds one more view of this heterogeneity. For most machines, \texttt{UA-MSTCN-Lite} remains fairly close to linear regression, but a small subset of entities drives most of the gap. The worst case in the current cohort is \texttt{m\_2014}, where the surrogate's average MAE reaches 9.37 compared with 6.04 for linear regression. This heterogeneity identifies where a deeper temporal model would earn its keep.
+Figure~\ref{fig:machine-cohort-entity} shows that most of the gap comes from a subset of machines. The worst case is \texttt{m\_2014}, where \texttt{UA-MSTCN-Lite} reaches 9.37 average MAE versus 6.04 for linear regression.
 
 \begin{figure}[htbp]
   \centering
@@ -165,7 +183,7 @@ Figure~\ref{fig:machine-cohort-entity} adds one more view of this heterogeneity.
   \label{fig:machine-cohort-entity}
 \end{figure}
 
-The machine-cohort experiment still supports the uncertainty-aware part of the paper. Table~\ref{tab:machine-cohort-coverage} shows that average $P50$ coverage stays close to 0.5 across horizons and average $P90$ coverage stays between 0.847 and 0.891. The longer-horizon under-coverage is therefore not unique to the aggregate benchmark. This cross-entity pattern strengthens the interpretation that the predictive controller genuinely benefits from an explicit scale-out margin rather than receiving one only as a patch for a single series.
+The uncertainty result is more stable than the point-ranking result. Table~\ref{tab:machine-cohort-coverage} shows average $P50$ coverage near 0.5 and $P90$ coverage between 0.847 and 0.891, so longer-horizon under-coverage is not unique to the aggregate series.
 
 \begin{table}[htbp]
   \centering
@@ -194,7 +212,7 @@ The machine-cohort experiment still supports the uncertainty-aware part of the p
 
 \subsection{Cross-machine transfer}
 
-The next question is whether forecasting structure learned from one set of machines transfers to unseen machines. To test this, the study runs a 3-fold zero-shot transfer benchmark on the same 12-machine cohort. In each fold, 8 machines are used to train pooled global models and 4 machines are held out entirely for evaluation. Table~\ref{tab:machine-transfer} summarizes the result.
+The transfer benchmark trains pooled global models on 8 machines and evaluates zero-shot on 4 held-out machines, repeated over 3 deterministic folds. Table~\ref{tab:machine-transfer} summarizes the result.
 
 \begin{table}[htbp]
   \centering
@@ -214,9 +232,9 @@ The next question is whether forecasting structure learned from one set of machi
   \end{tabular}
 \end{table}
 
-The most important observation is not about the uncertainty-aware surrogate. It is that pooled linear regression transfers extremely well across machines. Its mean MAE differs from the entity-specific linear upper bound by only $-0.004$, $-0.017$, and $-0.013$ at the 1-, 5-, and 10-minute horizons, respectively. In other words, the held-out machines in this cohort share enough temporal structure that a simple global linear model generalizes almost perfectly. The global MLP baseline is the next-best zero-shot point predictor, with mean MAE 3.735, 5.722, and 6.286, but it still trails global linear regression at every horizon. This result sets a strong and transparent transfer baseline instead of assuming that a more complex model should dominate by default.
+Pooled linear regression transfers almost as well as entity-specific linear regression: its mean MAE differs by only $-0.004$, $-0.017$, and $-0.013$ at the 1-, 5-, and 10-minute horizons. The global MLP is the next-best zero-shot point predictor, but still trails global linear regression at every horizon.
 
-The global \texttt{UA-MSTCN-Lite} model does not beat that baseline on point accuracy, but it still contributes transferable uncertainty estimates. Across held-out machines, its average $P90$ coverage is 0.904, 0.859, and 0.853 for the 1-, 5-, and 10-minute horizons. The same pattern seen in the aggregate and per-machine benchmarks therefore remains visible under zero-shot transfer: point-prediction leadership belongs to the linear baseline, while the uncertainty-aware surrogate remains useful because it exports calibrated quantile bands that a controller can consume.
+Global \texttt{UA-MSTCN-Lite} does not beat the linear point baseline, but its held-out-machine $P90$ coverage remains 0.904, 0.859, and 0.853. The transfer result therefore preserves the same boundary: linear point forecasts lead, while the surrogate supplies controller-facing uncertainty.
 
 \begin{figure}[htbp]
   \centering
@@ -227,26 +245,9 @@ The global \texttt{UA-MSTCN-Lite} model does not beat that baseline on point acc
 
 \subsection{Container service-level evidence}
 
-The construct-validity gap is now materially narrower because the evaluation no longer stops at aggregate and machine abstractions. Using the official \texttt{container\_meta} table together with a full mirrored pass over \texttt{container\_usage}, the study builds a broad service-level cohort covering 139 \texttt{app\_du} groups, 19{,}419 selected containers, 19{,}269 matched containers, and the full shared 11{,}520-minute span introduced in Section~4. A dedicated overlap audit retains all 10 services from the earlier targeted cohort, and the broader audited selection materially changes the service-level conclusions. Table~\ref{tab:service-cohort-promotion} shows that broader service coverage shifts the forecasting winner from \texttt{UA-MSTCN-Lite} to linear regression, turns the scaling-actions delta positive, and leaves the apparent over-provisioning gain unsupported under paired service bootstrap.
+The service cohort narrows the construct-validity gap by moving from aggregate and machine abstractions to 139 audited \texttt{app\_du} groups over the shared 11{,}520-minute span. The overlap audit retains all 10 earlier targeted services, but the broader selection changes the service-level headline: point-forecast leadership shifts to linear regression, and the earlier action-reduction claim no longer survives.
 
-\begin{table}[htbp]
-  \centering
-  \caption{Comparison of service-level conclusions under the earlier targeted top-10 cohort and the broader audited cohort. Deltas are equal-weighted predictive-minus-reactive means.}
-  \label{tab:service-cohort-promotion}
-  \scriptsize
-  \setlength{\tabcolsep}{2pt}
-  \renewcommand{\arraystretch}{0.96}
-  \begin{tabular}{lcccccc}
-    \toprule
-    Cohort & Svcs & Cov. & Winner & SLA $\Delta$ & Over $\Delta$ & Acts $\Delta$ \\
-    \midrule
-    Top-10 & 10 & 0.971 & UA-Lite & +0.033 & -0.720 & -52.4 \\
-    Broad & 139 & 0.973 & Linear & +0.014 & -2.633 & +150.4 \\
-    \bottomrule
-  \end{tabular}
-\end{table}
-
-Table~\ref{tab:service-forecasting-summary} summarizes the forecasting result on the audited broad cohort. Linear regression is strongest at every horizon, with MAE 19.999, 34.250, and 43.463 at the 1-, 5-, and 10-minute horizons, respectively. Persistence becomes the overall runner-up at 33.381 average MAE, which is itself a useful warning that local continuity remains a very strong service-level baseline under the broader selection rule. The standard neural MLP baseline does not change that ranking: its average MAE is 37.066, ahead of \texttt{UA-MSTCN-Lite} at 37.787 but behind both linear regression and persistence. The narrower targeted cohort had favored \texttt{UA-MSTCN-Lite}, but that ranking does not survive broader audited service coverage.
+Table~\ref{tab:service-forecasting-summary} shows that linear regression is strongest at every horizon (MAE 19.999, 34.250, and 43.463). Persistence is the overall runner-up, and the MLP remains ahead of \texttt{UA-MSTCN-Lite} but behind both linear regression and persistence. The earlier targeted ranking favoring \texttt{UA-MSTCN-Lite} does not survive broader audited service coverage.
 
 \begin{table}[htbp]
   \centering
@@ -268,7 +269,7 @@ Table~\ref{tab:service-forecasting-summary} summarizes the forecasting result on
   \end{tabular}
 \end{table}
 
-Figure~\ref{fig:service-forecasting} shows the same result visually. The more interesting interpretation is not simply that a different model wins. It is that the service traces are much less homogeneous than the aggregate or machine cohorts, and once the selection widens enough, that heterogeneity no longer favors the uncertainty-aware surrogate on point accuracy. This is precisely why a broader service-level extension matters: it reveals that service-level conclusions based on a small targeted subset can move materially once the selection rule is widened and audited.
+Figure~\ref{fig:service-forecasting} shows the same result visually. The broader service route matters because it exposes heterogeneity that a small targeted subset missed.
 
 \begin{figure}[htbp]
   \centering
@@ -277,20 +278,66 @@ Figure~\ref{fig:service-forecasting} shows the same result visually. The more in
   \label{fig:service-forecasting}
 \end{figure}
 
-The quantile behavior also remains useful at this finer granularity. Across the 139 services, the empirical $P90$ coverage of \texttt{UA-MSTCN-Lite} is 0.921, 0.896, and 0.877 at the 1-, 5-, and 10-minute horizons, respectively. The median forecasts remain slightly under-centered, with $P50$ coverage between 0.469 and 0.481, but the upper quantile stays close enough to the nominal target to justify its continued use inside the predictive controller even though the model no longer leads on point MAE.
+At service level, \texttt{UA-MSTCN-Lite} still provides usable upper quantiles: $P90$ coverage is 0.921, 0.896, and 0.877 at the three horizons. $P50$ coverage is slightly low (0.469--0.481), but the upper quantile remains close enough for the predictive-controller test.
 
-The service-level control comparison is more stringent than the aggregate result because it evaluates the policy under heterogeneous service demand rather than one shared cluster signal. Averaged over the 139 services, the forecast-free lagged target-tracking baseline again marks one extreme of the trade-off surface: it drives over-provisioning down to 3.848 and average reserved capacity down to 124.046, but SLA violation rises to 0.486 and scaling actions explode to 1660.9. Against the operational reactive baseline, the predictive controller raises mean SLA violation from 0.0173 to 0.0311, raises mean scaling actions from 249.0 to 399.4, and raises mean reserved capacity from 164.484 to 178.008, while mean over-provisioning falls from 56.310 to 53.677. The paired service bootstrap makes the conclusion sharper. The equal-weighted predictive-minus-reactive SLA delta is +0.0138 with a 95\% interval of [0.0035, 0.0271], which is a stable degradation. The equal-weighted scaling-actions delta is +150.4 with interval [114.0, 185.0], another stable degradation. The equal-weighted over-provisioning delta remains negative at -2.633, but its interval [-6.953, 2.328] crosses zero, so the apparent over-provisioning gain is not stably supportable under broader service resampling. The auxiliary load-weighted mean scaling-actions delta is nearly zero (-0.567) and also not stable, which suggests that the equal-weighted penalty is driven more by widespread small-service regressions than by the highest-load services alone. At the per-service level, predictive control improves SLA violation for only 27 of 139 services and reduces scaling actions for only 32 of 139, even though it reduces over-provisioning for 95 services. These mixed and negative findings are not incidental; they identify the boundary conditions under which a shared global predictive policy fails under service heterogeneity.
+The service-level control comparison is stricter because demand is heterogeneous. Averaged over 139 services, lagged target tracking lowers over-provisioning to 3.848 but raises SLA violation to 0.486 and actions to 1660.9. Relative to reactive control, the predictive policy raises mean SLA violation from 0.0173 to 0.0311 and actions from 249.0 to 399.4, while mean over-provisioning falls from 56.310 to 53.677.
+
+The paired service bootstrap fixes the headline. Predictive-minus-reactive SLA delta is +0.0138 with 95\% interval [0.0035, 0.0271], and scaling-actions delta is +150.4 with interval [114.0, 185.0], so both degradations are stable. Over-provisioning differs: the mean delta is -2.633, but its interval [-6.953, 2.328] crosses zero. The auxiliary load-weighted action delta is nearly zero (-0.567 with interval [-64.257, 68.245]), indicating that the equal-weighted action penalty comes mainly from many smaller services rather than the highest-load services alone.
+
+Figure~\ref{fig:service-policy-delta-distribution} shows the same heterogeneity: SLA and action deltas stay positive through most service ranks, while over-provisioning straddles zero for many services.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Lightweight mechanism summary for predictive-minus-reactive service outcomes on the audited broad cohort. Panel A reports equal-weighted mean deltas after rank-based median splits on selected service descriptors. Panel B reports an outcome taxonomy; near-neutral requires all three absolute deltas to fall below the cohort-specific first-quartile absolute-delta thresholds. Lower is better for all three metrics.}
+  \label{tab:service-policy-mechanism}
+  \fontsize{7.3}{8.1}\selectfont
+  \setlength{\tabcolsep}{2.2pt}
+  \renewcommand{\arraystretch}{0.93}
+  \begin{tabular}{@{}llrrrr@{}}
+    \toprule
+    \multicolumn{6}{l}{\textbf{Panel A: Descriptor splits}} \\
+    Split & Half & Svcs & SLA $\Delta$ & Over $\Delta$ & Acts $\Delta$ \\
+    \midrule
+    Mean load & High & 69 & +0.011 & -0.800 & +45.4 \\
+    Mean load & Low & 70 & +0.017 & -4.440 & +254.0 \\
+    Burstiness & High & 69 & +0.023 & +4.970 & +82.2 \\
+    Burstiness & Low & 70 & +0.005 & -10.127 & +217.7 \\
+    Lag-1 autocorr. & High & 69 & +0.026 & -5.731 & +95.0 \\
+    Lag-1 autocorr. & Low & 70 & +0.002 & +0.421 & +205.1 \\
+    Imputation ratio & High & 69 & +0.018 & +0.105 & +144.7 \\
+    Imputation ratio & Low & 70 & +0.010 & -5.332 & +156.1 \\
+    \bottomrule
+  \end{tabular}
+
+  \vspace{0.45em}
+
+  \begin{tabular}{@{}p{0.42\columnwidth}rrr@{}}
+    \toprule
+    \multicolumn{4}{l}{\textbf{Panel B: Outcome taxonomy}} \\
+    Category & Svcs & Share (\%) & Load share (\%) \\
+    \midrule
+    SLA improved, Over improved & 6 & 4.3 & 6.5 \\
+    SLA improved, Actions worsened & 7 & 5.0 & 4.7 \\
+    Over improved, SLA worsened & 87 & 62.6 & 47.9 \\
+    All worsened & 12 & 8.6 & 4.9 \\
+    Near-neutral & 3 & 2.2 & 3.0 \\
+    Other mixed & 24 & 17.3 & 33.0 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Table~\ref{tab:service-policy-mechanism} adds a mechanism view. SLA degradation is strongest in high-burstiness (+0.0227) and high-autocorrelation (+0.0255) services, while over-provisioning gains concentrate in low-burstiness (-10.127) and low-load (-4.440) halves. The dominant category is ``over improved, SLA worsened'' (87 of 139 services); only 6 services improve both SLA and over-provisioning. Thus the shared global predictive policy mainly trades lower over-provisioning for worse SLA and actions, with the harshest SLA penalties in burstier and more persistent services.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=\linewidth]{../experiments/results/service_cohort_broad/figures/service_policy_summary.png}
-  \caption{Service-level policy summary across the audited 139-service cohort. The lagged baseline exposes the naive target-chasing extreme, while the predictive controller no longer preserves the earlier service-level action-reduction headline under broader coverage.}
-  \label{fig:service-policy-summary}
+  \includegraphics[width=\linewidth]{../experiments/results/service_cohort_broad/figures/service_policy_delta_distribution.png}
+  \caption{Sorted predictive-minus-reactive deltas across the audited 139-service cohort. Negative values are favorable for all three metrics. The positive centers of the SLA and scaling-actions panels show that those penalties are widespread rather than caused only by a few extreme services, while over-provisioning remains heterogeneous around zero.}
+  \label{fig:service-policy-delta-distribution}
 \end{figure}
 
 \subsection{Trace-driven control comparison}
 
-The aggregate control comparison is driven by a trained uncertainty-aware forecaster rather than by a placeholder forecast source. Table~\ref{tab:policy-results} now summarizes three policies. The reactive threshold policy achieves almost zero SLA violation, but only by carrying a very conservative mean capacity of 0.821 against an average required capacity of 0.470. The lagged target-tracking baseline occupies the opposite extreme: it nearly eliminates over-provisioning (0.013) and keeps mean reserved capacity close to the required load (0.469), but it incurs 47.1\% SLA violation and 1616 scaling actions because one-step-lagged target chasing is too unstable. The predictive policy sits between these extremes. It raises SLA violation to 3.46\%, but cuts over-provisioning by 59.8\% relative to reactive control and keeps mean reserved capacity at 0.610. This is a meaningful systems trade-off rather than an artifact of incomparable units, because all three policies are evaluated in the same normalized required-capacity space and the predictive route applies the same headroom logic to both forecasts and realized demand.
+Table~\ref{tab:policy-results} summarizes aggregate control. Reactive control achieves near-zero SLA violation by carrying mean capacity 0.821 against average required capacity 0.470. Lagged target tracking nearly eliminates over-provisioning but incurs 47.1\% SLA violation and 1616 actions. The predictive policy sits between them: SLA violation rises to 3.46\%, but over-provisioning falls by 59.8\% relative to reactive control, with mean capacity 0.610. All policies share the same normalized required-capacity space.
 
 \begin{table}[htbp]
   \centering
@@ -310,6 +357,8 @@ The aggregate control comparison is driven by a trained uncertainty-aware foreca
   \end{tabular}
 \end{table}
 
+Using QLR as the predictive uncertainty source gives the same aggregate boundary: SLA violation 0.034, over-provisioning 0.147, and 587 actions at the 5-minute horizon. QLR is safer than lagged target tracking but worse than reactive control on SLA and actions, and it is not treated as a full 139-service result.
+
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=\linewidth]{../experiments/results/figures/policy_capacity_comparison.png}
@@ -319,7 +368,7 @@ The aggregate control comparison is driven by a trained uncertainty-aware foreca
 
 \subsection{Policy ablation and sensitivity}
 
-The control analysis is now deeper than a single reactive-versus-predictive table. Table~\ref{tab:policy-ablation} shows that the current controller depends heavily on two ingredients: a conservative scale-out margin and cooldown-controlled scale-in. Removing the scale-out margin raises SLA violation from 0.0346 to 0.1137. Removing cooldown keeps over-provisioning relatively low, but pushes the action count from 589 to 1617 and also raises SLA violation to 0.1119. A median-only policy is clearly unacceptable in this setup, with SLA violation rising to 0.3337. By contrast, removing the scale-in guard has almost no effect, which suggests that the current aggregate trace is dominated by scale-out uncertainty rather than scale-in ambiguity.
+Table~\ref{tab:policy-ablation} shows that the controller depends mainly on the scale-out margin and cooldown. Removing the margin raises SLA violation from 0.0346 to 0.1137; removing cooldown raises actions from 589 to 1617 and SLA violation to 0.1119. A median-only policy is unsafe (0.3337 SLA violation), while removing the scale-in guard has almost no effect.
 
 \begin{table}[htbp]
   \centering
@@ -340,13 +389,13 @@ The control analysis is now deeper than a single reactive-versus-predictive tabl
   \end{tabular}
 \end{table}
 
-Figure~\ref{fig:policy-pareto} extends the same argument with a sweep over scale-out margin and cooldown settings. The chosen default point $(m=0.10, c=8)$ is not globally optimal on any single axis, but it sits near the middle of the observed Pareto surface. Smaller margins reduce over-provisioning but push SLA risk sharply upward, while larger margins and longer cooldown improve SLA protection by consuming more steady capacity. This is exactly the kind of operational trade-off that a systems paper should make explicit rather than hide behind a single best configuration.
+Figure~\ref{fig:policy-pareto} sweeps scale-out margin and cooldown. The default $(m=0.10, c=8)$ is not optimal on a single axis, but it sits near the middle of the observed Pareto surface: smaller margins reduce over-provisioning but raise SLA risk, while larger margins and longer cooldown consume more steady capacity.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.82\linewidth]{../experiments/results/figures/policy_pareto_sensitivity.png}
+  \includegraphics[width=\linewidth]{../experiments/results/figures/policy_pareto_sensitivity.png}
   \caption{Sensitivity of the predictive controller to scale-out margin and cooldown. The selected default operates in the middle of the observed SLA-versus-over-provisioning trade-off.}
   \label{fig:policy-pareto}
 \end{figure}
 
-The boundary is now narrower. A public trace-driven simulator with a trained forecasting backbone, calibration evidence, and policy ablations is strong evidence for reproducible control trends, but it is still not a substitute for a live production deployment. The current result should therefore be interpreted as trace-level evidence about when predictive control succeeds and when it fails, not as proof that the same policy would transfer unchanged to a real cluster controller.
+The final boundary is narrow: the simulator provides reproducible trace-level evidence about when predictive control helps or fails, but it does not prove that the same policy transfers unchanged to a live cluster controller.

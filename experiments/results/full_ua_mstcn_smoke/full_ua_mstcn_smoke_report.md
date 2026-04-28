@@ -1,0 +1,32 @@
+# Full UA-MSTCN Smoke Report
+
+- run_id: `full_ua_mstcn_smoke_20260428`
+- status: `pass`
+- output_dir: `D:\Desktop\Cluster Computing\paper-workbench-full\Users\liujinchun\Downloads\skills_codex\paper-workbench\experiments\results\full_ua_mstcn_smoke`
+- device: `NVIDIA GeForce RTX 4070 Ti SUPER`
+- torch: `2.5.1+cu121`
+- runtime_seconds: `1.170`
+- scope: Stage 1 smoke only; no manuscript conclusion is changed.
+- test split use: evaluation only; model fitting uses the training prefix and validation is only monitored.
+- central metrics.csv updated: `False`
+
+## Gate Result
+
+- PASS: smoke gate passed.
+
+## Loss Trace
+
+- train_losses: `0.261530, 0.223532, 0.201443`
+- valid_losses: `0.198549, 0.227449, 0.207822`
+
+## Metrics
+
+```csv
+run_id,split,model_name,horizon,n_predictions,mae,rmse,mape,p50_pinball,p90_pinball,p50_coverage,p90_coverage,interval_width,crossing_count,crossing_rate
+full_ua_mstcn_smoke_20260428,validation,full_ua_mstcn_smoke,1,291,3.6891591548919678,4.710726261138916,0.11993230879306793,1.8445796376651096,1.0422544322063012,0.4501718282699585,0.8109965920448303,4.486181259155273,0,0.0
+full_ua_mstcn_smoke_20260428,validation,full_ua_mstcn_smoke,5,291,5.05712366104126,6.353863716125488,0.1589096486568451,2.528561608488207,1.2639682147101436,0.47422680258750916,0.8213058710098267,6.927987098693848,0,0.0
+full_ua_mstcn_smoke_20260428,validation,full_ua_mstcn_smoke,10,291,4.507514476776123,5.6570963859558105,0.140925332903862,2.2537572113509032,1.167958524382812,0.42268040776252747,0.8453608155250549,7.2772321701049805,0,0.0
+full_ua_mstcn_smoke_20260428,test,full_ua_mstcn_smoke,1,291,9.693133354187012,12.413650512695312,0.1856333613395691,4.846567035950336,3.7631803833741917,0.15463916957378387,0.4982817769050598,7.745603561401367,0,0.0
+full_ua_mstcn_smoke_20260428,test,full_ua_mstcn_smoke,5,291,7.061793804168701,9.108635902404785,0.14379681646823883,3.5308972060475563,1.598237254611406,0.36082473397254944,0.8865979313850403,11.818530082702637,0,0.0
+full_ua_mstcn_smoke_20260428,test,full_ua_mstcn_smoke,10,291,9.594558715820312,12.17558765411377,0.18255683779716492,4.797279315306149,2.5049181928339723,0.13745704293251038,0.6219931244850159,11.078173637390137,0,0.0
+```

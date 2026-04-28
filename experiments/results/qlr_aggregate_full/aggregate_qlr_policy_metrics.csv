@@ -1,0 +1,4 @@
+experiment_id,dataset_split,model_name,policy_name,horizon,sla_violation,over_provisioning,under_provisioning,scaling_actions,average_capacity
+qlr-policy-reactive,test,n/a,reactive_threshold,5,0.0006180469715698393,0.3505654283028808,1.1669491992555367e-05,43,0.8206896554033274
+qlr-policy-lagged-tracking,test,n/a,lagged_target_tracking,5,0.47095179233621753,0.013447960038719798,0.014215703304689877,1616,0.469368153326469
+qlr-policy-predictive,test,quantile_linear_regression,predictive_uncertainty_aware_qlr,5,0.033992583436341164,0.14741551987556142,0.0014025248340861335,587,0.6161488916339143

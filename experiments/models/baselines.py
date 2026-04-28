@@ -8,7 +8,7 @@ import warnings
 
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LinearRegression, QuantileRegressor
 from sklearn.neural_network import MLPRegressor
 from sklearn.preprocessing import StandardScaler
 
@@ -28,6 +28,24 @@ class ForecastResult:
     horizon: int
     y_true: np.ndarray
     y_pred: np.ndarray
+
+
+@dataclass
+class QuantileForecastResult:
+    name: str
+    horizon: int
+    y_true: np.ndarray
+    p50: np.ndarray
+    p90: np.ndarray
+    raw_p90: np.ndarray | None = None
+
+    @property
+    def y_pred(self) -> np.ndarray:
+        return self.p50
+
+    @property
+    def p90_guarded(self) -> np.ndarray:
+        return self.p90
 
 
 @dataclass
@@ -66,6 +84,34 @@ def linear_regression(
     model.fit(train_x, train_y)
     pred = model.predict(test_x)
     return ForecastResult("linear_regression", horizon, test_y, pred)
+
+
+def quantile_linear_regression(
+    train_series: np.ndarray,
+    test_series: np.ndarray,
+    context_window: int,
+    horizon: int,
+    *,
+    alpha: float = 1e-4,
+    solver: str = "highs",
+) -> QuantileForecastResult:
+    train_x, train_y = make_supervised(train_series, context_window, horizon)
+    test_x, test_y = make_supervised(test_series, context_window, horizon)
+    scaler = StandardScaler()
+    train_x_scaled = scaler.fit_transform(train_x)
+    test_x_scaled = scaler.transform(test_x)
+
+    p50_model = QuantileRegressor(quantile=0.5, alpha=alpha, solver=solver)
+    p90_model = QuantileRegressor(quantile=0.9, alpha=alpha, solver=solver)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        p50_model.fit(train_x_scaled, train_y)
+        p90_model.fit(train_x_scaled, train_y)
+
+    p50 = p50_model.predict(test_x_scaled)
+    raw_p90 = p90_model.predict(test_x_scaled)
+    p90 = np.maximum(raw_p90, p50)
+    return QuantileForecastResult("quantile_linear_regression", horizon, test_y, p50, p90, raw_p90)
 
 
 def random_forest(

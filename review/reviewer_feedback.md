@@ -1,3 +1,33 @@
+## Round 016
+
+- `review_round`: `016`
+- `review_date`: `2026-04-27`
+- `phase`: `pre-QLR freeze and aggregate QLR smoke`
+- `status`: `QLR smoke gate passed`
+
+### Actions Completed
+
+- Created additive freeze record at `revisions/pre-qlr-freeze-2026-04-27.md`.
+- Added run registry at `experiments/02-run-registry.md`.
+- Created dedicated `paper-tcn` environment for QLR work without installing Full UA-MSTCN/PyTorch dependencies.
+- Added a minimal `quantile_linear_regression` interface and aggregate smoke runner.
+- Added low-risk manuscript revisions: Section 2 and Section 4 preambles, Gul 2022 resource-reservation citation, visible smoke-test terminology cleanup, and figure-width readability adjustments.
+
+### QLR Smoke Evidence
+
+- Artifact: `experiments/results/qlr_smoke/aggregate_qlr_smoke_metrics.csv`.
+- Horizon 1: MAE 2.265, P50 coverage 0.496, P90 coverage 0.900.
+- Horizon 5: MAE 3.967, P50 coverage 0.502, P90 coverage 0.883.
+- Horizon 10: MAE 4.315, P50 coverage 0.484, P90 coverage 0.886.
+- Non-crossing violations: 0 for all horizons.
+
+### Boundaries Preserved
+
+- Full UA-MSTCN was not started.
+- Full 139-service QLR was not started.
+- No QLR result has been promoted into manuscript-facing claims yet.
+- Public repository URL remains unresolved and was not fabricated.
+
 # Reviewer Feedback Log
 
 本文件为累计审稿日志。后续每次收到“审稿 / 复审 / 更新反馈”请求时，在文件末尾追加新一轮记录，不覆盖既有内容。
@@ -211,6 +241,576 @@
 - [Journal of Grid Computing journal page](https://link.springer.com/journal/10723)
 - [Journal of Grid Computing submission guidelines](https://www.springer.com/journal/10723/submission-guidelines)
 - [Alibaba Cluster Trace Program](https://github.com/alibaba/clusterdata)
+
+## Round 015
+
+- `review_round`: `015`
+- `review_date`: `2026-03-12`
+- `input_snapshot`:
+  - [`sn-article-template/sn-article.tex`](/Users/liujinchun/Downloads/skills_codex/sn-article-template/sn-article.tex)
+  - [`sn-article-template/sn-jnl.cls`](/Users/liujinchun/Downloads/skills_codex/sn-article-template/sn-jnl.cls)
+  - [`sn-article-template/bst/sn-mathphys-num.bst`](/Users/liujinchun/Downloads/skills_codex/sn-article-template/bst/sn-mathphys-num.bst)
+  - [`main.tex`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/main.tex)
+  - [`main_jgc.tex`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/main_jgc.tex)
+  - [`experiments.tex`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/sections/experiments.tex)
+  - [`results.tex`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/sections/results.tex)
+- `target_journals`:
+  - `Primary`: `Cluster Computing`
+  - `Backup`: `Journal of Grid Computing`
+- `overall_verdict_cluster`: `Template-compatible in content, but not yet template-style source package`
+- `overall_verdict_jgc`: `Template-compatible in content, but not yet template-style source package`
+- `higher_tier_ceiling`: `Not relevant for this round; this round evaluates LaTeX template conformity rather than scientific ceiling`
+
+### Review Summary
+
+当前稿件与新下载的 Springer `sn-article-template` 在 **class/style 层面是对齐的**，但在 **源文件组织和提交打包习惯** 上仍有两处明显偏离。
+
+首先，当前稿件使用的 [`sn-jnl.cls`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/sn-jnl.cls) 与新模板中的 [`sn-jnl.cls`](/Users/liujinchun/Downloads/skills_codex/sn-article-template/sn-jnl.cls) 校验一致；[`sn-mathphys-num.bst`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/sn-mathphys-num.bst) 与模板中的 [`bst/sn-mathphys-num.bst`](/Users/liujinchun/Downloads/skills_codex/sn-article-template/bst/sn-mathphys-num.bst) 也完全一致。这说明你当前主稿和后备稿并没有使用过期或不匹配的类文件。
+
+其次，front matter 也总体兼容模板：
+
+- [`main.tex`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/main.tex) 与 [`main_jgc.tex`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/main_jgc.tex) 都采用与模板相同的 `\documentclass[pdflatex,sn-mathphys-num]{sn-jnl}`。
+- 标题、作者、机构、摘要、关键词和 `MSC` 分叉都处于模板允许的写法范围内。
+- `Cluster` 版用 bibliography 在前、declarations 在后；`JGC` 版则反过来，这属于 journal-specific 分叉，不是模板错误。
+
+但模板包本身在文件头明确写了两条当前稿件仍未满足的源文件组织要求：
+
+1. 不要用 `\input{...}`，提交时应为一个 `.tex` 文档。
+2. 所有附加图文件应单独附上，而不是通过跨工作区路径依赖。
+
+这两条与当前项目树有直接冲突：
+
+- [`main.tex:19`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/main.tex#L19) 到 [`main.tex:49`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/main.tex#L49) 以及 [`main_jgc.tex:25`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/main_jgc.tex#L25) 到 [`main_jgc.tex:55`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/main_jgc.tex#L55) 仍全面使用 `\input{sections/...}`。
+- [`experiments.tex:66`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/sections/experiments.tex#L66) 到 [`experiments.tex:80`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/sections/experiments.tex#L80) 以及 [`results.tex:44`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/sections/results.tex#L44) 到 [`results.tex:376`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/sections/results.tex#L376) 的图路径仍直接指向 `../experiments/results/...`。
+
+因此，这一轮的结论是：**论文内容与 Springer 模板兼容，但若按模板包的“源码提交”方式准备 source package，你还需要做一次 submission packaging cleanup。**
+
+### Prioritized Findings
+
+#### Major
+
+1. **当前主稿与后备稿都仍使用多文件 `\input` 结构，不符合模板包顶部的单文件提交说明**
+   - 证据位置：
+     - [`sn-article-template/sn-article.tex:6`](/Users/liujinchun/Downloads/skills_codex/sn-article-template/sn-article.tex#L6)
+     - [`sn-article-template/sn-article.tex:7`](/Users/liujinchun/Downloads/skills_codex/sn-article-template/sn-article.tex#L7)
+     - [`main.tex:19`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/main.tex#L19)
+     - [`main_jgc.tex:25`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/main_jgc.tex#L25)
+   - 问题原因：模板包明确建议“不要使用 `\input{...}`，提交为一个 `.tex` 文档”。当前项目结构适合研发与版本管理，但不是模板推荐的最终 source-submission 形态。
+   - 修改要求：投稿前额外准备一个 flatten 后的 submission 版 `main_submit.tex` / `main_jgc_submit.tex`，或在打包步骤中自动合并 section 文件，不建议直接破坏当前 workbench 结构。
+
+2. **当前图文件路径跨出 `manuscript/` 目录，不利于按模板包组织 source submission**
+   - 证据位置：
+     - [`sn-article-template/sn-article.tex:9`](/Users/liujinchun/Downloads/skills_codex/sn-article-template/sn-article.tex#L9)
+     - [`sn-article-template/sn-article.tex:10`](/Users/liujinchun/Downloads/skills_codex/sn-article-template/sn-article.tex#L10)
+     - [`experiments.tex:66`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/sections/experiments.tex#L66)
+     - [`results.tex:315`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/sections/results.tex#L315)
+   - 问题原因：模板包要求图文件作为附加文件单独随稿附上。当前相对路径依赖 `../experiments/results/...`，本地编译没问题，但如果只上传 `manuscript/` 子树，会直接丢图。
+   - 修改要求：为最终提交包准备一个独立的 `manuscript/figures_submit/` 或等价目录，把投稿实际需要的图复制进去，并改成不跨目录的相对路径。
+
+#### Minor
+
+1. **当前 declarations 头部写法与模板示例不同，但这不是阻塞问题**
+   - 证据位置：
+     - [`main.tex:48`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/main.tex#L48)
+     - [`main_jgc.tex:54`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/main_jgc.tex#L54)
+     - [`sn-article-template/sn-article.tex:551`](/Users/liujinchun/Downloads/skills_codex/sn-article-template/sn-article.tex#L551)
+   - 问题原因：模板示例使用 `\section*{Declarations}`，你当前使用 `\section*{Statements and Declarations}`。这属于 journal-specific wording 差异，不是技术性不兼容。
+   - 修改要求：不必仅因模板示例而改回 generic `Declarations`，继续以目标刊要求为准。
+
+2. **当前稿件未显式使用 `\backmatter`，但也不构成明显模板不兼容**
+   - 证据位置：
+     - [`sn-article-template/sn-article.tex:535`](/Users/liujinchun/Downloads/skills_codex/sn-article-template/sn-article.tex#L535)
+   - 问题原因：模板示例在结论后进入 `\backmatter`，再写 supplementary/acknowledgements/declarations。当前稿件没有使用该命令，但当前编译和版式并未因此出错。
+   - 修改要求：可选，不建议为了这点单独动稿。
+
+### Required Actions Before Submission
+
+1. 若只提交 PDF，当前稿件已经与模板家族兼容。
+2. 若要提交 LaTeX 源文件，建议额外准备一个 `source package`：
+   - 单文件 `.tex`
+   - 所有投稿实际需要的图放入随稿目录
+   - 不再依赖 `../experiments/results/...`
+3. 不建议为了迎合模板包而破坏当前 workbench 的多文件研发结构，最好单独生成 submission build。
+
+### Delta From Previous Round
+
+- `新增`
+  - 本轮新增了对本地 `sn-article-template` 的直接模板对照；
+  - 结论从“稿件 ready to submit”进一步细化为“PDF 投稿兼容，但 source package 仍需 flatten + relocate figures”。
+
+### Sources Used For This Round
+
+- Local Springer template: [`sn-article-template/sn-article.tex`](/Users/liujinchun/Downloads/skills_codex/sn-article-template/sn-article.tex)
+- Local Springer class file: [`sn-article-template/sn-jnl.cls`](/Users/liujinchun/Downloads/skills_codex/sn-article-template/sn-jnl.cls)
+- Local Springer bibliography style: [`sn-article-template/bst/sn-mathphys-num.bst`](/Users/liujinchun/Downloads/skills_codex/sn-article-template/bst/sn-mathphys-num.bst)
+
+## Round 016
+
+- `review_round`: `016`
+- `review_date`: `2026-03-12`
+- `input_snapshot`:
+  - User-provided official submission requirement:
+    - `LaTeX documents with figures and tables compressed into a .zip format. We will compile these into a PDF for peer review.`
+  - Current manuscript entry files:
+    - [`main.tex`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/main.tex)
+    - [`main_jgc.tex`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/main_jgc.tex)
+- `target_journals`:
+  - `Primary`: `Cluster Computing`
+  - `Backup`: `Journal of Grid Computing`
+- `overall_verdict_cluster`: `Current manuscript is acceptable for zip-based LaTeX submission after source-package cleanup`
+- `overall_verdict_jgc`: `Current manuscript is acceptable for zip-based LaTeX submission after source-package cleanup`
+
+### Review Summary
+
+本轮根据你提供的官方要求，上一轮关于“必须 flatten 成单一 `.tex` 文件”的判断需要校正。
+
+官方要求强调的是：
+
+- 提交 `LaTeX documents`
+- 连同 `figures and tables`
+- 一起压缩成 `.zip`
+- 由期刊方重新编译 PDF
+
+这说明**单文件 `.tex` 不是硬性前提**；真正的硬要求是：你的 zip 包必须自洽、可编译、路径闭合，并且让编辑部能明确知道哪个 `.tex` 是主入口文件。
+
+因此，当前稿件的多文件 `\\input` 结构本身并不构成投稿阻塞。需要修正的重点变成：
+
+1. zip 包中必须只保留当前目标刊对应的主入口文件；
+2. 所有被引用的 section 文件、bib、bst、cls、图表文件都必须随包提供；
+3. 不能依赖工作区外部路径或“只有本地工程结构才成立”的相对路径；
+4. 最好避免把 `Cluster Computing` 与 `JGC` 两套入口同时混在同一个初投 zip 中，以免编辑部误选错误入口。
+
+### Prioritized Findings
+
+#### Major
+
+1. **“必须单文件提交”的要求应下调为“必须提供自洽可编译的 zip source package”**
+   - 问题原因：用户补充的官方要求已经明确允许 `LaTeX documents` 以 `.zip` 形式提交，并由期刊方编译。这意味着多文件结构可以接受，只要依赖完整且入口清楚。
+   - 修改要求：不必强制 flatten 当前 workbench；改为准备一个投稿专用 zip 包。
+
+2. **初投 zip 里应只保留一个主入口文件**
+   - 证据位置：
+     - [`main.tex`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/main.tex)
+     - [`main_jgc.tex`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/main_jgc.tex)
+   - 问题原因：虽然项目当前维护了 `Cluster` 与 `JGC` 两个入口，但期刊编译时通常只需要一个明确的 submission root。把两个入口同时塞进同一个投稿 zip，容易带来误编译或编辑部沟通成本。
+   - 修改要求：主投 `Cluster Computing` 时，zip 包只放 `main.tex` 路线；`main_jgc.tex` 另存为后备投稿包，不建议混装。
+
+#### Minor
+
+1. **图文件与依赖文件需要“随包闭合”，而不是只在本地工程里可解析**
+   - 问题原因：期刊会在其环境中重新编译，所以 zip 必须包含：
+     - 主 `.tex`
+     - 所有 `sections/*.tex`
+     - `refs.bib`
+     - `sn-jnl.cls`
+     - 对应 `.bst`
+     - 所有实际引用到的 figure/table source files
+   - 修改要求：投稿前做一次“解压到临时空目录后能否直接编译”的验证，比是否单文件更重要。
+
+2. **建议为 zip 包加一个极简 README**
+   - 问题原因：官方要求没有禁止多文件结构，但编辑部编译时需要快速识别入口。
+   - 修改要求：在 zip 根目录放一个简短说明，例如：
+     - main file: `main.tex`
+     - compile command: `latexmk -pdf main.tex`
+     - figures included locally
+   - 这不是硬要求，但能降低人工处理风险。
+
+### Recommended Packaging Advice
+
+1. `Cluster Computing` 初投包：
+   - 根目录保留 `main.tex`
+   - 保留 `sections/`
+   - 保留 `refs.bib`
+   - 保留 `sn-jnl.cls`
+   - 保留 `sn-mathphys-num.bst`
+   - 保留所有被引用的 figures
+   - 不放 `main_jgc.tex`
+
+2. `Journal of Grid Computing` 后备包：
+   - 单独打一个 zip
+   - 根目录主入口改为 `main_jgc.tex`
+   - 其余依赖同理
+
+3. 提交前验证方式：
+   - 将 zip 解压到一个干净临时目录
+   - 只用 zip 内文件执行 `latexmk -pdf main.tex`
+   - 确认没有外部路径依赖
+
+### Required Actions Before Submission
+
+1. 撤回“必须单文件 flatten”的硬要求。
+2. 改为准备一个 `zip-based source package`。
+3. 初投时只提交主投期刊对应的单一入口文件与其全部依赖。
+4. 在干净目录完成一次 source-package 编译验收。
+
+### Delta From Previous Round
+
+- `已修正`
+  - 上一轮把模板首页的“不要使用 `\input`”解读得过硬；在官方提交要求补充后，应修正为“单文件是模板建议，不是当前投稿硬门槛”。
+
+- `当前主结论`
+  - 你的稿件更需要的是 `source package hygiene`，而不是 `source structure rewrite`。
+
+### Sources Used For This Round
+
+- User-provided official submission requirement:
+  - `LaTeX documents with figures and tables compressed into a .zip format. We will compile these into a PDF for peer review.`
+- Local Springer template: [`sn-article-template/sn-article.tex`](/Users/liujinchun/Downloads/skills_codex/sn-article-template/sn-article.tex)
+
+## Round 017
+
+- `review_round`: `017`
+- `review_date`: `2026-03-12`
+- `input_snapshot`:
+  - User-proposed plan: `Cluster Submission Package Cleanup Plan`
+  - Existing packager:
+    - [`scripts/build_repro_package.py`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/scripts/build_repro_package.py)
+    - [`submission/reproducibility-package-manifest.yaml`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/submission/reproducibility-package-manifest.yaml)
+    - [`submission/checklist.md`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/submission/checklist.md)
+- `target_journals`:
+  - `Primary`: `Cluster Computing`
+  - `Backup`: `Journal of Grid Computing`
+- `overall_verdict_cluster`: `Plan is strong and correctly scoped, with two implementation refinements`
+- `overall_verdict_jgc`: `Out of scope by design; deferral is appropriate`
+
+### Review Summary
+
+这份 `Cluster Submission Package Cleanup Plan` 明显比前一版返修计划更合理，已经很好地对齐了 Round 016 的核心结论：**这轮要解决的是 source-package hygiene，而不是再动科研内容或文章叙事。**
+
+从当前项目结构看，这个方案具备较强可执行性：
+
+- 现有 [`build_repro_package.py`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/scripts/build_repro_package.py) 已经提供了 manifest-driven staging 的先例；
+- 当前主稿的图引用数确实是 `17`，且 basename 无冲突，因此“复制到 package-local `figures/` 并按 basename 重写”在当前稿件状态下是安全的；
+- `Cluster only`、不混入 `main_jgc.tex` 的范围控制也是对的。
+
+因此，总体评价是：**计划方向正确，可以实施。**
+
+不过还有两处值得在实施前写得更明确，否则后面容易返工。
+
+### Prioritized Findings
+
+#### Minor
+
+1. **builder 应明确只打包“当前入口文件递归可达依赖”，而不是额外夹带整个 manuscript 目录**
+   - 问题原因：你计划里已经写了递归解析 `\\input` / `\\bibliography` / `\\includegraphics`，这本身是对的。需要进一步明确的是：最终 staged source tree 应该只包含该入口真正依赖到的 section 文件、bib、cls、bst 和图，不要因为沿用现有 packager 习惯而把 `main_jgc.tex`、本地 review render、pagecheck 或其他 manuscript 辅助目录顺手带进去。
+   - 修改要求：在 manifest 或脚本设计里把“dependency-driven copy”定成主逻辑，而不是“copy manuscript/ then exclude noise”。
+
+2. **验证标准应明确成“在干净目录中只依赖 zip 内文件编译”，而不是只在原仓库里 staging 后编译**
+   - 问题原因：这是这轮最关键的验收点。只在 staged tree 原地跑 `latexmk` 还不够，因为相对路径或遗留文件有可能被原仓库环境掩盖。
+   - 修改要求：保留你写的 `--verify` 方案，并明确：
+     - 复制 staged tree 到临时空目录；
+     - 只在该目录执行 `latexmk -pdf main.tex`；
+     - 成功后删除验证副产物，不把它们带入最终 zip。
+
+#### Editorial
+
+1. **当前计划不需要再扩大到“单文件 flatten”或“JGC 同步打包”**
+   - 问题原因：你这版计划的边界控制是对的。官方要求是 zip-based LaTeX source compilation，不要求单文件；而 `JGC` 又是后备路线，此时不混装、不并做是正确选择。
+   - 修改要求：保持当前范围，不要在实施时再扩张。
+
+### Recommended Refinements
+
+1. manifest 字段建议至少显式包含：
+   - `package_name`
+   - `entry_file`
+   - `static_files`
+   - `readme`
+   - `exclude_globs`
+   - `archive_format: zip`
+
+2. builder 逻辑建议固定为：
+   - parse entry
+   - collect reachable `.tex`
+   - collect reachable `.bib`
+   - collect reachable figures
+   - copy static style files
+   - materialize local `figures/`
+   - rewrite staged TeX only
+   - verify in clean temp dir
+   - zip staged tree
+
+3. `submission/checklist.md` 的新增条目建议拆成两个复选框：
+   - `Cluster source package staged`
+   - `Cluster source package verified in clean directory`
+
+### Required Actions Before Submission
+
+1. 这份计划可以直接执行。
+2. 执行前只需把“dependency-driven copy”和“clean-dir verify”两个点写得更硬。
+3. 本轮不建议额外扩大到：
+   - flatten 单文件
+   - JGC 包同步生成
+   - 重新整理正文或图表内容
+
+### Delta From Previous Round
+
+- `已收敛`
+  - 从“是否需要重写源结构”进一步收敛为“单独构建 Cluster source package”；
+  - 与 Round 016 一致，继续坚持 zip-based source package hygiene，而不是正文改稿。
+
+- `新增`
+  - 当前主稿引用图数已核对为 `17`，且 basename 无重名，说明 `figures/<basename>` 重写策略当前是安全的。
+
+### Sources Used For This Round
+
+- [`scripts/build_repro_package.py`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/scripts/build_repro_package.py)
+- [`submission/reproducibility-package-manifest.yaml`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/submission/reproducibility-package-manifest.yaml)
+- [`submission/checklist.md`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/submission/checklist.md)
+
+## Round 018
+
+- `review_round`: `018`
+- `review_date`: `2026-03-12`
+- `input_snapshot`:
+  - [`scripts/build_submission_package.py`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/scripts/build_submission_package.py)
+  - [`submission/cluster-source-package-manifest.yaml`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/submission/cluster-source-package-manifest.yaml)
+  - [`submission/checklist.md`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/submission/checklist.md)
+  - [`submission/source-package/cluster-computing/README.md`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/submission/source-package/cluster-computing/README.md)
+  - [`submission/source-package/cluster-computing.zip`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/submission/source-package/cluster-computing.zip)
+- `target_journals`:
+  - `Primary`: `Cluster Computing`
+  - `Backup`: `Journal of Grid Computing`
+- `overall_verdict_cluster`: `Ready to Submit`
+- `overall_verdict_jgc`: `Not reviewed in this round by design`
+
+### Review Summary
+
+这轮 packaging-only 改动已经基本完成了 Round 016 和 Round 017 的要求，而且不是“文件看起来合理”，而是已经通过了实际构建与干净目录编译验证。
+
+关键验收结果如下：
+
+- [`build_submission_package.py`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/scripts/build_submission_package.py) 现在确实按入口文件递归收集依赖，而不是粗暴复制整个 `manuscript/` 目录。
+- 脚本把图文件本地化到 staged 包内的 `figures/`，并只在 staged TeX 中重写图路径，不会污染 workbench 主稿。
+- `--verify` 已被做成强制要求；builder 在临时空目录复制 staged tree 后执行 `latexmk -pdf main.tex`，并且本轮复验实际通过。
+- 归档产物 [`cluster-computing.zip`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/submission/source-package/cluster-computing.zip) 只有一个根目录 `cluster-computing/`，包含 `main.tex`、`sections/`、`refs.bib`、`sn-jnl.cls`、`sn-mathphys-num.bst`、`figures/` 和 `README.md`。
+- zip 中未发现 `main_jgc.tex`，符合“Cluster-only submission package”的范围控制。
+- 当前主稿引用图数已由实际构建再次验证为 `17`，且 staged 包中这 `17` 张图全部被本地收录。
+
+### Prioritized Findings
+
+#### Editorial
+
+1. **本轮未发现新的 packaging blocker；Cluster source package 已达到可提交状态**
+   - 证据位置：
+     - [`build_submission_package.py:150`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/scripts/build_submission_package.py#L150)
+     - [`build_submission_package.py:258`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/scripts/build_submission_package.py#L258)
+     - [`build_submission_package.py:319`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/scripts/build_submission_package.py#L319)
+     - [`build_submission_package.py:350`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/scripts/build_submission_package.py#L350)
+   - 问题原因：依赖解析、staging、本地图路径重写、clean-dir 验证和 zip 归档都已经落地且跑通。
+   - 修改要求：无必须继续修改项。
+
+#### Minor
+
+1. **`submission/checklist.md` 中仍有若干全局投稿项未勾选，但这不再属于 source-package blocker**
+   - 证据位置：
+     - [`submission/checklist.md:14`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/submission/checklist.md#L14)
+     - [`submission/checklist.md:15`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/submission/checklist.md#L15)
+     - [`submission/checklist.md:32`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/submission/checklist.md#L32)
+   - 问题原因：这些是更广义的投稿前清单项，不影响当前 Cluster source zip 的可编译性。
+   - 修改要求：按你整体投稿节奏决定是否勾选，不必为这轮 packaging 再返工。
+
+### Required Actions Before Submission
+
+1. 就 Cluster 源码包而言，当前已经没有必须新增的修改。
+2. 正式上传前，只需要做最后一次人工检查：
+   - 上传的是否是 [`cluster-computing.zip`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/submission/source-package/cluster-computing.zip)
+   - 而不是 workbench 全仓库或 review-freeze 包
+3. `JGC` 如需后续打包，应单独做一个平行 package，不要复用当前 Cluster zip。
+
+### Delta From Previous Round
+
+- `已解决`
+  - `dependency-driven copy` 已实现；
+  - `clean-dir verify` 已实现且实际通过；
+  - `Cluster-only` 范围控制已落实；
+  - `figures/<basename>` 本地化策略已在真实构建中验证可用。
+
+- `新增`
+  - 无新的高优先级问题。
+
+### Sources Used For This Round
+
+- User-provided official submission requirement:
+  - `LaTeX documents with figures and tables compressed into a .zip format. We will compile these into a PDF for peer review.`
+- [`scripts/build_submission_package.py`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/scripts/build_submission_package.py)
+- [`submission/cluster-source-package-manifest.yaml`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/submission/cluster-source-package-manifest.yaml)
+- [`submission/checklist.md`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/submission/checklist.md)
+- [`submission/source-package/cluster-computing.zip`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/submission/source-package/cluster-computing.zip)
+
+## Round 019
+
+- `review_round`: `019`
+- `review_date`: `2026-03-12`
+- `input_snapshot`:
+  - User-provided title-page suggestions
+  - [`main.tex`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/main.tex)
+  - [`main_jgc.tex`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/main_jgc.tex)
+- `target_journals`:
+  - `Primary`: `Cluster Computing`
+  - `Backup`: `Journal of Grid Computing`
+- `overall_verdict_cluster`: `User suggestions are directionally correct; two should be adopted and one should be handled conservatively`
+
+### Review Summary
+
+本轮重新核对了 `Cluster Computing` 当前公开作者指南中的 `Title page` 要求。该页目前要求题名页包含：
+
+- 所有作者姓名；
+- 作者机构全称与邮寄地址；
+- 对应作者的 `e-mail`、`telephone` 和 `fax`；
+- 以及摘要与关键词。
+
+对照当前 front matter：
+
+- [`main.tex:15`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/main.tex#L15) 到 [`main.tex:20`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/main.tex#L20)
+- [`main_jgc.tex:21`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/main_jgc.tex#L21) 到 [`main_jgc.tex:26`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/main_jgc.tex#L21)
+
+你提出的三条建议里，`1` 和 `3` 我认同，`2` 需要更保守地执行。
+
+### Prioritized Findings
+
+#### Major
+
+1. **非通讯作者邮箱不必在题名页显式突出；若当前类文件将其排成 `Contributing authors`，建议移除**
+   - 证据位置：
+     - [`main.tex:16`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/main.tex#L16)
+     - [`main_jgc.tex:22`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/main_jgc.tex#L22)
+   - 问题原因：`Cluster Computing` 当前公开题名页要求只明确要求通讯作者的 `e-mail`、`telephone` 和 `fax`。它并未要求在首页单独突出所有 contributing authors 的邮箱。若 `sn-jnl` 排版结果出现 `Contributing authors: 166...@qq.com` 之类的行，这更像类文件的副产物，而不是期刊要求。
+   - 修改要求：建议删除非通讯作者在 front matter 中的 `\email{...}`，只保留通讯作者邮箱。非通讯作者邮箱若系统投稿页需要，再在投稿系统元数据中补即可。
+
+2. **作者联系方式应只保留通讯作者，不建议同时列出每位作者手机**
+   - 证据位置：
+     - [`main.tex:20`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/main.tex#L20)
+     - [`main_jgc.tex:26`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/main_jgc.tex#L26)
+   - 问题原因：当前写法把 `Jinchun Liu` 和 `Haoxun Li` 的电话都写进了 `\presentaddress{...}`。这不符合官方要求的最小必要原则，也不够像标准 Springer title-page 联系方式写法。
+   - 修改要求：建议改成只保留通讯作者联系方式，例如只写 `Jinchun Liu (corresponding author), e-mail ..., tel. ..., fax ...`。
+
+#### Minor
+
+1. **传真项建议保守补齐，但不需要“乱填”**
+   - 证据位置：
+     - [`main.tex:20`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/main.tex#L20)
+     - [`main_jgc.tex:26`](/Users/liujinchun/Downloads/skills_codex/paper-workbench/manuscript/main_jgc.tex#L26)
+   - 问题原因：`Cluster Computing` 当前公开作者指南的 title-page 文本仍保留 `telephone and fax numbers` 的说法。但在当前 Springer 实际投稿流程中，传真通常不是编辑初筛的高频阻塞项。
+   - 修改要求：如果你继续保留这条 `presentaddress` 联系方式行，最稳妥的补法是写 `fax: N/A` 或等价 `Fax: not applicable`，不要空着，也不要编造号码。若后续投稿系统单独采集对应作者信息，则以系统字段为准。
+
+### Required Actions Before Submission
+
+1. 删除非通讯作者在 front matter 中的 `\email{...}`。
+2. 把 `\presentaddress{...}` 改成只保留通讯作者联系方式。
+3. 若继续在题名页中显式列联系信息，则为传真补 `Fax: N/A`。
+
+### Delta From Previous Round
+
+- `新增`
+  - 本轮新增的是 `Cluster Computing` 题名页要求的专项核对；
+  - 结论是：当前 front matter 仍可更贴近官方最小要求，尤其是非通讯作者邮箱和多作者手机号不必保留。
+
+### Sources Used For This Round
+
+- [Cluster Computing submission guidelines](https://link.springer.com/journal/10586/submission-guidelines)
+
+## Round 014
+
+- `review_round`: `014`
+- `review_date`: `2026-03-12`
+- `input_snapshot`:
+  - User-proposed revision plan titled `返修优先级与预计顺序`
+  - Current target journals:
+    - `Cluster Computing`
+    - `Journal of Grid Computing`
+- `overall_verdict_cluster`: `Plan direction is sound but materially over-scoped for the current target`
+- `overall_verdict_jgc`: `Plan direction is sound but materially over-scoped for the current target`
+- `higher_tier_ceiling`: `Several proposed P0 items are better interpreted as higher-tier strengthening or post-review rebuttal preparation, not pre-submission requirements for the current target journals`
+
+### Review Summary
+
+这份计划的科学方向整体是对的，尤其是把文章明确定位成 `benchmark / evaluation / boundary-mapping` 而不是强行包装成方法全面领先，这与当前稿件最可信的结果是一致的。但是，**按 `Cluster Computing` 与 `Journal of Grid Computing` 的实际门槛来看，这份计划明显 over-scoped 了**。
+
+当前目标刊的官方要求主要集中在：摘要长度、关键词数量、声明与数据可得性、期刊范围匹配以及完整投稿包，而不是要求在初投前就补齐一整套 failure-mechanism taxonomy、effect-size overhaul、章节重构和大规模新图体系。对目前这篇已经达到可投状态的稿件来说，把这些全部列为 `P0` 会显著拖慢投稿，且边际录用收益不一定匹配投入。
+
+因此，本轮对计划的总判断是：
+
+- `任务 1` 方向正确，但不应整体列为 `P0`，尤其不建议把“必须改题目”当成硬前提。
+- `任务 2` 与 `任务 3` 是最有科研增益的增强项，但更适合当作 `P1` 或“收到 reviewer 追问后的优先补充”。
+- `任务 4` 中的 discussion/conclusion 轻微收紧是合理的，但当前稿件并不需要大幅重写。
+- `任务 5` 到 `任务 8` 里，一部分已经在当前稿件与 review package 中完成，另一部分则属于可选增强，不应再当成当前投稿前提。
+- `任务 10` 的章节重构不推荐在此阶段进行；它风险高、收益有限，而且当前章节顺序已经符合两刊常规组织方式。
+
+### Prioritized Findings
+
+#### Major
+
+1. **将 `任务 1-4` 全部列为 `P0`，对当前目标刊而言过度返修**
+   - 问题原因：`Cluster Computing` 与 `Journal of Grid Computing` 当前官方要求强调的是稿件完整性、范围匹配和声明合规，而不是在初投前补完一整套高强度机制分析与统计展示。当前稿件已满足摘要、关键词、声明区和双期刊变体的核心门槛。
+   - 修改要求：把 `P0` 缩减为真正会影响当前投稿决定的最小集合，只保留“必要的 claim consistency pass”；把 failure mechanism、subgroup analysis、taxonomy、effect size、更多图表整体下调为 `P1`。
+
+2. **“必须改题目”这一条判断过强，而且存在 fit 风险**
+   - 问题原因：把题目硬切成 `benchmark` 导向，可能削弱论文与 cluster resource management / predictive autoscaling 主题的直接对接。当前题目虽然不完美，但对两刊范围是安全的。
+   - 修改要求：如果改题目，只建议在保留 `predictive autoscaling` / `cluster workloads` 主轴的前提下微调，不建议把“改题目”放入必须项。你给出的三个备选里，更稳的是 `方案 C`，而不是更纯 benchmark 化的 `方案 A`。
+
+#### Minor
+
+1. **任务 2 的机制分析是高价值增强，但不应当成“否则不建议投稿”的条件**
+   - 问题原因：service descriptor、subgroup analysis、outcome taxonomy、calibration-control linkage 的确能增强 scientific depth，但它们更像“把已经成立的 boundary result 讲得更深”，而不是“让当前稿件从不可投变成可投”。
+   - 修改要求：保留该任务，但从 `P0` 下调到 `P1`。若时间有限，优先做最短闭环：`service descriptors + subgroup table + 一张 delta distribution 图`。
+
+2. **任务 3 的统计增强应聚焦少数 headline 指标，不必全面铺开**
+   - 问题原因：当前稿件已经有 paired bootstrap；继续补 CI / 分布图是加分项，但“aggregate forecasting MAE、machine MAE、broad MAE、全部 effect size、全部 violin/box/bootstraps” 会迅速膨胀工作量。
+   - 修改要求：若继续做，只建议补 `service-level policy deltas` 的 CI / distribution first；对 forecasting 只需维持当前 summary table，不必在初投前做全面统计重构。
+
+3. **任务 5-8 中已有部分工作实际上已经完成**
+   - 问题原因：当前稿件已经补入 `2023--2026` 相关工作，已建立私有 review repository + frozen package 口径，cover letter / JGC variant 也已同步。将这些再列为强返修项，会重复投入。
+   - 修改要求：把相关工作与 artifact 改为“只做局部 polish”；图表体系若要增强，也应围绕 `one new high-value figure` 原则，而不是一次性补四类新图。
+
+4. **任务 10 的章节重构风险大于收益**
+   - 问题原因：当前 `Introduction / Related Work / Problem Formulation / Experimental Setup / Results and Discussion / Threats / Conclusion` 已是两刊可接受的标准结构。强行改成 `Pipeline / Forecasting Results / Control Results / Discussion` 会引入新的组织与交叉引用风险。
+   - 修改要求：不建议在此轮投稿前执行。除非收到 major revision 明确要求，否则保持当前结构更稳。
+
+### Recommended Re-Prioritization
+
+1. `True P0`:
+   - 只做一次 `claim consistency pass`
+   - 检查题目、摘要、引言、discussion、conclusion 是否都维持当前真实定位：`reproducible evaluation + boundary mapping`, not method superiority
+   - 若要加图，只加 `1` 张 `service-level delta distribution` 或 `pipeline/workflow` 图
+
+2. `P1`:
+   - 轻量版 failure mechanism analysis
+   - `service descriptors`
+   - `subgroup comparison`
+   - 一张 `delta distribution` 图
+   - 对 `service-level policy deltas` 增补更完整的 CI / bootstrap exposition
+
+3. `P2`:
+   - 大规模统计重构
+   - 章节重构
+   - 完整 reviewer Q&A 包
+   - 更多 exploratory 图表
+
+### Required Actions Before Submission
+
+1. 如果目标是尽快向 `Cluster Computing` 初投，不建议按当前计划把 `任务 1-4` 全部当成投稿前必做项。
+2. 若你还愿意多投入一轮时间，最值钱的增强只保留三件事：
+   - 一次轻量的 claim-consistency polish
+   - 一组轻量的 service-level mechanism analysis
+   - 一张真正回答 reviewer 问题的分布图或流程图
+3. 其余任务更适合作为：
+   - reviewer 提问后的补充材料
+   - major revision 储备
+   - 或面向更高层级期刊的增强路线
+
+### Delta From Previous Round
+
+- `新增`
+  - 本轮评审对象是“返修计划”本身，而不是正文新改动；
+  - 结论明确转为：当前计划方向正确，但对目标刊明显 over-scoped；
+  - 最需要修正的不是稿件，而是返修优先级排序。
+
+### Sources Used For This Round
+
+- [Cluster Computing journal page](https://link.springer.com/journal/10586)
+- [Cluster Computing submission guidelines](https://www.springer.com/journal/10586/submission-guidelines)
+- [Journal of Grid Computing journal page](https://link.springer.com/journal/10723)
+- [Journal of Grid Computing submission guidelines](https://www.springer.com/journal/10723/submission-guidelines)
 
 ## Round 012
 

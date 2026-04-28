@@ -118,6 +118,8 @@ def bootstrap_deltas(
         )
 
         eq_mean = float(deltas.mean())
+        median_delta = float(np.median(deltas))
+        q25_delta, q75_delta = np.quantile(deltas, [0.25, 0.75])
         load_mean = float(np.average(deltas, weights=weights))
         eq_ci_low, eq_ci_high = np.quantile(eq_samples, [0.025, 0.975])
         load_ci_low, load_ci_high = np.quantile(load_samples, [0.025, 0.975])
@@ -131,6 +133,13 @@ def bootstrap_deltas(
             "equal_weighted_ci_high": float(eq_ci_high),
             "equal_weighted_stability": eq_label,
             "equal_weighted_sign": eq_sign,
+            "equal_weighted_median_delta": median_delta,
+            "equal_weighted_q25_delta": float(q25_delta),
+            "equal_weighted_q75_delta": float(q75_delta),
+            "equal_weighted_iqr_delta": float(q75_delta - q25_delta),
+            "services_improved": int(np.sum(deltas < 0)),
+            "services_worsened": int(np.sum(deltas > 0)),
+            "services_unchanged": int(np.sum(np.isclose(deltas, 0.0))),
             "load_weighted_mean_delta": load_mean,
             "load_weighted_ci_low": float(load_ci_low),
             "load_weighted_ci_high": float(load_ci_high),
@@ -189,6 +198,13 @@ def build_summary_row(
         row[f"{prefix}_equal_ci_high"] = info["equal_weighted_ci_high"]
         row[f"{prefix}_equal_stability"] = info["equal_weighted_stability"]
         row[f"{prefix}_equal_sign"] = info["equal_weighted_sign"]
+        row[f"{prefix}_equal_median_delta"] = info["equal_weighted_median_delta"]
+        row[f"{prefix}_equal_q25_delta"] = info["equal_weighted_q25_delta"]
+        row[f"{prefix}_equal_q75_delta"] = info["equal_weighted_q75_delta"]
+        row[f"{prefix}_equal_iqr_delta"] = info["equal_weighted_iqr_delta"]
+        row[f"{prefix}_services_improved"] = info["services_improved"]
+        row[f"{prefix}_services_worsened"] = info["services_worsened"]
+        row[f"{prefix}_services_unchanged"] = info["services_unchanged"]
         row[f"{prefix}_load_delta"] = info["load_weighted_mean_delta"]
         row[f"{prefix}_load_ci_low"] = info["load_weighted_ci_low"]
         row[f"{prefix}_load_ci_high"] = info["load_weighted_ci_high"]

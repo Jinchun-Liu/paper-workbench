@@ -1,0 +1,28 @@
+entry_file: manuscript/main.tex
+static_dependencies:
+  - manuscript/sn-jnl.cls
+  - manuscript/sn-mathphys-num.bst
+readme:
+  title: Cluster Computing Source Package
+  description: Self-contained LaTeX source for the Cluster Computing submission.
+  main_file: main.tex
+  compile_command: latexmk -pdf main.tex
+  notes:
+    - All referenced figures are included locally under `figures/`.
+    - The package is intended to compile without any dependency on files outside this zip.
+exclude_globs:
+  - manuscript/*.pdf
+  - manuscript/*.aux
+  - manuscript/*.bbl
+  - manuscript/*.blg
+  - manuscript/*.fdb_latexmk
+  - manuscript/*.fls
+  - manuscript/*.log
+  - manuscript/*.out
+  - manuscript/rendered_pages/**
+  - manuscript/review_render/**
+  - manuscript/review_render_p2/**
+  - manuscript/visual_check/**
+  - manuscript/visual_check_white/**
+  - submission/frozen-package/**
+  - submission/source-package/**

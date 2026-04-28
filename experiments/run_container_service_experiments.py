@@ -108,26 +108,33 @@ def render_service_overview(df: pd.DataFrame, path: Path) -> None:
     if len(services) > 12:
         services = services[:12]
         title = "Top-12 service CPU demand traces within the selected app_du cohort"
-    fig, axes = plt.subplots(len(services), 1, figsize=(10.5, 3.0 * len(services)), sharex=True)
-    if len(services) == 1:
-        axes = [axes]
-    for ax, app_du in zip(axes, services):
+    ncols = 3 if len(services) > 3 else 1
+    nrows = int(np.ceil(len(services) / ncols))
+    fig, axes = plt.subplots(nrows, ncols, figsize=(10.5, 2.0 * nrows + 0.7), sharex=True)
+    axes_flat = np.asarray(axes).reshape(-1)
+    for idx, (ax, app_du) in enumerate(zip(axes_flat, services)):
         group = df[df["app_du"] == app_du].sort_values("minute_index")
         ax.plot(
             group["minute_index"],
             group["service_cpu_used_cores_proxy"],
             color="#1f4e79",
-            linewidth=1.0,
+            linewidth=0.8,
         )
-        ax.set_ylabel("CPU cores")
+        if idx % ncols == 0:
+            ax.set_ylabel("CPU cores", fontsize=9)
         ax.set_title(
-            f"{app_du}: mean={group['service_cpu_used_cores_proxy'].mean():.1f}, "
-            f"peak={group['service_cpu_used_cores_proxy'].max():.1f}, "
-            f"cv={group['service_cpu_used_cores_proxy'].std() / max(group['service_cpu_used_cores_proxy'].mean(), 1e-6):.2f}"
+            f"{app_du}: mean={group['service_cpu_used_cores_proxy'].mean():.0f}, "
+            f"peak={group['service_cpu_used_cores_proxy'].max():.0f}, "
+            f"cv={group['service_cpu_used_cores_proxy'].std() / max(group['service_cpu_used_cores_proxy'].mean(), 1e-6):.2f}",
+            fontsize=9,
         )
+        ax.tick_params(axis="both", labelsize=8)
         ax.grid(alpha=0.18, linewidth=0.5)
-    axes[-1].set_xlabel("Minute index")
-    fig.suptitle(title, y=1.02)
+    for ax in axes_flat[len(services):]:
+        ax.axis("off")
+    for ax in axes_flat[max(0, len(services) - ncols):len(services)]:
+        ax.set_xlabel("Minute index", fontsize=9)
+    fig.suptitle(title, y=0.995, fontsize=12)
     save_figure(fig, path)
 
 

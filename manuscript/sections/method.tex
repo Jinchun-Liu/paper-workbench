@@ -25,10 +25,11 @@ c^\star_{e,t} = \max\left((1+\rho)\tilde{x}_{e,t},\; c_{\min}\right),
 \]
 where $\rho$ is the headroom ratio, $\tilde{x}_{e,t}$ is normalized demand, and $c_{\min}$ is the minimum capacity floor.
 
-For service-level experiments, the same logic is expressed in replica-equivalent units. Let $r_e$ denote the median per-container requested CPU cores for service $e$. The required replica-equivalent capacity becomes
+For service-level experiments, the same logic is expressed in replica-equivalent units. The required replica-equivalent capacity becomes
 \[
 c^\star_{e,t} = \max\left((1+\rho)\frac{x_{e,t}}{r_e},\; c_{\min}\right).
 \]
+where $r_e$ is the median per-container requested CPU cores for service $e$.
 This mapping is important because it places reactive, lagged-tracking, and predictive service policies in the same decision space.
 
 \paragraph{Reactive baseline.}
@@ -62,7 +63,9 @@ c_{e,t+1} &= c_{e,t},
 where $\Delta$ is the maximum single-step change and $\gamma$ is the scale-in safety margin. Cooldown suppresses oscillatory scale-in without delaying urgent scale-out.
 
 \paragraph{Forecasting backbone.}
-The proposed model family is framed as an uncertainty-aware multi-scale temporal forecaster. In the present experiments, that interface is instantiated by \texttt{UA-MSTCN-Lite}, a trainable multi-scale quantile-forest surrogate that emits $P50$ and $P90$ forecasts without introducing a heavyweight deep-learning dependency stack. The surrounding dataset contract, policy simulator, and evaluation protocol are kept stable so that a deeper temporal backbone can replace this surrogate in later revisions without changing the rest of the study design.
+The proposed model family is framed as an uncertainty-aware multi-scale temporal forecaster. In the present experiments, that interface is instantiated by \texttt{UA-MSTCN-Lite}, a paper-specific lightweight quantile-forest surrogate that emits $P50$ and $P90$ forecasts without introducing a heavyweight deep-learning dependency stack. \texttt{UA-MSTCN-Lite} is not the full deep UA-MSTCN architecture; it is the reproducible surrogate used to exercise the forecasting-to-control contract in this revision. The surrounding dataset contract, policy simulator, and evaluation protocol are kept stable so that a deeper temporal backbone can replace this surrogate in later work without changing the rest of the study design.
+
+Concretely, \texttt{UA-MSTCN-Lite} uses a 60-minute history window and predicts the 1-, 5-, and 10-minute horizons. Its feature extractor includes lag values at 1, 2, 3, 5, 10, 15, 20, 30, 45, and 60 minutes; multi-scale windows of 3, 5, 10, 20, 30, and 60 minutes; per-window mean, standard deviation, minimum, maximum, median, 0.1 quantile, 0.9 quantile, endpoint difference, last-minus-mean, and slope; and additional short/long moving-average and volatility differences. Each horizon is fitted with a separate \texttt{RandomForestRegressor} using 200 trees, \texttt{min\_samples\_leaf=3}, \texttt{max\_features="sqrt"}, random seed $42+h$, and \texttt{n\_jobs=-1}. Per-tree predictions define the empirical $P50$ and $P90$ outputs. The $P90$ path is widened by the 0.99 quantile of positive training residuals relative to $P50$, while $P50$ and $P90$ are clipped to the training target support, with the upper path allowed up to 1.10 times the training maximum before the calibration floor. Multi-entity transfer experiments use the same implementation with pooled windows from the training entities.
 
 \paragraph{Calibration objective.}
 Because the controller consumes quantiles rather than only point forecasts, the evaluation also measures empirical coverage:

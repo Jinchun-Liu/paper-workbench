@@ -1,0 +1,56 @@
+{
+  "run_id": "full_ua_mstcn_smoke_20260428",
+  "status": "pass",
+  "series_csv": "D:\\Desktop\\Cluster Computing\\paper-workbench-full\\Users\\liujinchun\\Downloads\\skills_codex\\paper-workbench\\data\\processed\\cluster_series_v2018.csv",
+  "output_dir": "D:\\Desktop\\Cluster Computing\\paper-workbench-full\\Users\\liujinchun\\Downloads\\skills_codex\\paper-workbench\\experiments\\results\\full_ua_mstcn_smoke",
+  "limit_rows": 2000,
+  "context_window": 60,
+  "horizons": [
+    1,
+    5,
+    10
+  ],
+  "train_end": 1400,
+  "valid_end": 1700,
+  "test_start": 1700,
+  "test_split_use": "evaluation only; no fitting, parameter selection, or policy selection",
+  "model": {
+    "input_channels": 4,
+    "hidden_width": 32,
+    "dilations": [
+      1,
+      2,
+      4
+    ],
+    "quantiles": [
+      "p50",
+      "p90"
+    ],
+    "non_crossing": "p90 = p50 + softplus(delta90)"
+  },
+  "environment": {
+    "python": "3.10.19 | packaged by Anaconda, Inc. | (main, Oct 21 2025, 16:41:31) [MSC v.1929 64 bit (AMD64)]",
+    "torch": "2.5.1+cu121",
+    "cuda_available": true,
+    "device": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "peak_cuda_memory_bytes": 2219642880
+  },
+  "runtime_seconds": 1.170003799998085,
+  "train_losses": [
+    0.26152992496887845,
+    0.22353179504474005,
+    0.20144262164831161
+  ],
+  "valid_losses": [
+    0.1985493153333664,
+    0.2274487018585205,
+    0.20782241225242615
+  ],
+  "test_output_shape": [
+    291,
+    3,
+    2
+  ],
+  "gate_failures": [],
+  "metrics_csv_updated": false
+}

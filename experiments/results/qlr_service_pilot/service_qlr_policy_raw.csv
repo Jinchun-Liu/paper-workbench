@@ -1,0 +1,16 @@
+app_du,selection_role,policy_name,model_name,horizon,request_cores_source,request_cores_used,request_fallback_used,sla_violation,over_provisioning,under_provisioning,scaling_actions,average_capacity
+app_2557,low_load_low_burst,reactive_service,n/a,5,median_container_request_cores,4.0,False,0.0,28.014600360576914,0.0,121,87.29750801282049
+app_2557,low_load_low_burst,lagged_tracking_service,n/a,5,median_container_request_cores,4.0,False,0.47896634615384615,0.5855109675480766,0.6523605518830119,1660,68.10849421574517
+app_2557,low_load_low_burst,qlr_predictive_service,quantile_linear_regression,5,median_container_request_cores,4.0,False,0.001201923076923077,18.204643553192135,0.002171898509606247,382,86.37781545476263
+app_7264,low_load_high_burst,reactive_service,n/a,5,median_container_request_cores,8.0,False,0.020432692307692308,17.006853966346267,0.0859385016025623,548,44.904711538461626
+app_7264,low_load_high_burst,lagged_tracking_service,n/a,5,median_container_request_cores,8.0,False,0.4957932692307692,3.6875188301282145,3.8941743790064214,1662,31.97470993589741
+app_7264,low_load_high_burst,qlr_predictive_service,quantile_linear_regression,5,median_container_request_cores,8.0,False,0.01622596153846154,29.98069298968935,0.07599429177907185,369,62.08606418268589
+app_1675,high_load_low_burst,reactive_service,n/a,5,median_container_request_cores,8.0,False,0.022235576923076924,40.487678786057444,0.6345242387820597,268,114.79714743589722
+app_1675,high_load_low_burst,lagged_tracking_service,n/a,5,median_container_request_cores,8.0,False,0.4855769230769231,3.3732846554486833,4.292296799879823,1662,85.26657967748396
+app_1675,high_load_low_burst,qlr_predictive_service,quantile_linear_regression,5,median_container_request_cores,8.0,False,0.04326923076923077,39.51785779148703,1.5789649360058542,343,124.12448467739627
+app_3665,high_load_high_burst,reactive_service,n/a,5,median_container_request_cores,4.0,False,0.034254807692307696,117.59165464743658,0.8147676282051127,446,369.66826121794907
+app_3665,high_load_high_burst,lagged_tracking_service,n/a,5,median_container_request_cores,4.0,False,0.4813701923076923,16.645879331931205,10.416771384214739,1662,297.0541882762417
+app_3665,high_load_high_burst,qlr_predictive_service,quantile_linear_regression,5,median_container_request_cores,4.0,False,0.033052884615384616,136.93260576893414,1.370914853381712,346,426.38677124407764
+app_521,median_anchor,reactive_service,n/a,5,median_container_request_cores,4.0,False,0.0,48.01320362580121,0.0,275,152.82093749999993
+app_521,median_anchor,lagged_tracking_service,n/a,5,median_container_request_cores,4.0,False,0.49759615384615385,1.2547042017227634,1.4209225010016044,1660,120.36267565604973
+app_521,median_anchor,qlr_predictive_service,quantile_linear_regression,5,median_container_request_cores,4.0,False,0.003605769230769231,40.154756406597876,0.011411451941902039,392,160.67223890998454

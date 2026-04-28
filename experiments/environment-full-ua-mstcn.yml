@@ -1,0 +1,16 @@
+name: paper-full-ua-mstcn
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - numpy
+  - pandas
+  - scikit-learn
+  - matplotlib
+  - pyyaml
+  - tqdm
+  - pytorch
+  - pytorch-cuda=12.1

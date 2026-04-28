@@ -2,6 +2,8 @@
 
 This note summarizes the reproducibility package referenced by the manuscript declarations and cover letters.
 
+Public repository stated in the current manuscript: `https://github.com/Jinchun-Liu/paper-workbench`.
+
 ## Scope
 
 The frozen package for the current manuscript version is intended to include:
@@ -14,13 +16,9 @@ The frozen package for the current manuscript version is intended to include:
 
 The concrete package manifest used to stage this bundle is stored at `submission/reproducibility-package-manifest.yaml`.
 
-## Review Access
+## Public Repository Access
 
-During peer review, the submitted version is maintained in a private GitHub review repository together with the frozen review-freeze package. Access can be granted to the editor and reviewers so that the manuscript numbers, figures, and service-cohort artifacts can be audited against the submitted version without exposing the repository publicly before a final publication decision.
-
-## Public Release Plan
-
-Upon acceptance, the same frozen package will be deposited in a stable public repository with a persistent identifier and referenced from the final Data Availability and Code Availability statements.
+The current revision declares the public repository above as the access route for the manuscript source, preprocessing route, model training code, broad service-cohort construction scripts, figure-generation artifacts, and predictive-control simulator. Anonymous web/API/git access to the repository URL was verified on 2026-04-28 before upload.
 
 ## Staging Command
 

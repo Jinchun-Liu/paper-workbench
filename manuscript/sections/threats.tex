@@ -1,13 +1,13 @@
-This work has several validity threats that must remain explicit in the final paper.
+Several validity threats remain.
 
 \paragraph{External validity.}
-The study evaluates public Alibaba traces rather than a live production platform. This means the conclusions are strongest for trace-driven comparative analysis and weaker for direct production deployment claims.
+The study uses public Alibaba traces rather than a live platform, so the conclusions are strongest for trace-driven comparison and weaker for direct deployment claims.
 
 \paragraph{Construct validity.}
-The construct-validity gap is materially narrower than in the earlier draft because the pipeline no longer stops at normalized cluster capacity or machine-level entities. It now includes a broad official-data service-level cohort derived from \texttt{container\_meta} and a full mirrored pass over \texttt{container\_usage}. However, this cohort is still not a literal service census. It is bounded by an explicit metadata prefilter requiring at least 60 containers and at least 650{,}000 seconds of span, followed by full-profile and post-aggregation quality thresholds. The resulting benchmark is therefore much broader and more defensible than the earlier top-10 extension, but it should still be interpreted as a rule-based service cohort rather than as the full production population of every \texttt{app\_du} in the trace.
+The service cohort narrows the construct-validity gap but is not a full service census. It is bounded by a metadata prefilter requiring at least 60 containers and 650{,}000 seconds of span, followed by usage-profile and post-aggregation quality thresholds. The benchmark should therefore be read as a broad rule-based service cohort, not the full \texttt{app\_du} population.
 
 \paragraph{Internal validity.}
-The proposed model family is currently instantiated by a lightweight trainable surrogate rather than by the final deep UA-MSTCN architecture. This keeps the artifact reproducible in the local environment, but it also means the manuscript should not overclaim architectural novelty from the present implementation. The reported numbers are valid for the verified current surrogate and policy route, not yet for a deeper temporal model that has not been implemented.
+\texttt{UA-MSTCN-Lite} is a lightweight trainable surrogate, not the final deep UA-MSTCN architecture. The reported numbers therefore apply to the verified surrogate and policy route, not to an unimplemented deeper model.
 
 \paragraph{Conclusion validity.}
-Forecasting gains do not automatically imply better capacity control. The manuscript therefore keeps forecasting metrics and policy metrics separate and should not collapse them into a single narrative of improvement without evidence from both layers.
+Forecasting gains do not automatically imply better capacity control, so forecasting and policy metrics are kept separate. The service-descriptor splits and taxonomy are descriptive benchmark analyses, not causal identification for live services.

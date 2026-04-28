@@ -1,0 +1,56 @@
+{
+  "run_id": "full_ua_mstcn_pilot_20260428",
+  "status": "pass",
+  "output_dir": "D:\\Desktop\\Cluster Computing\\paper-workbench-full\\Users\\liujinchun\\Downloads\\skills_codex\\paper-workbench\\experiments\\results\\full_ua_mstcn_pilot",
+  "scope": "Stage 2 pilot only; no broad Full UA-MSTCN run executed",
+  "test_split_use": "evaluation only; fitting uses train prefix and P90 calibration uses validation prefix",
+  "seed": 42,
+  "horizons": [
+    1,
+    5,
+    10
+  ],
+  "context_window": 60,
+  "fixed_services": [
+    "app_2557",
+    "app_7264",
+    "app_1675",
+    "app_3665",
+    "app_521"
+  ],
+  "metrics_csv_hash_before": "0fa3fdb810ca0a0f74592d3adc92102c7a0ca67ea02c2b8c8f22435537f873ab",
+  "metrics_csv_hash_after": "0fa3fdb810ca0a0f74592d3adc92102c7a0ca67ea02c2b8c8f22435537f873ab",
+  "resource_before": {
+    "os": "Windows-10-10.0.26200-SP0",
+    "python": "3.10.19 | packaged by Anaconda, Inc. | (main, Oct 21 2025, 16:41:31) [MSC v.1929 64 bit (AMD64)]",
+    "torch": "2.5.1+cu121",
+    "cuda_available": true,
+    "cuda_device": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "logical_cpu_count": 16,
+    "process_memory_rss_bytes": 394416128,
+    "total_memory_bytes": 33409392640,
+    "free_memory_bytes": 11675344896,
+    "workspace_drive": "D:\\",
+    "drive_total_bytes": 500098396160,
+    "drive_used_bytes": 443629178880,
+    "drive_free_bytes": 56469217280
+  },
+  "resource_after": {
+    "os": "Windows-10-10.0.26200-SP0",
+    "python": "3.10.19 | packaged by Anaconda, Inc. | (main, Oct 21 2025, 16:41:31) [MSC v.1929 64 bit (AMD64)]",
+    "torch": "2.5.1+cu121",
+    "cuda_available": true,
+    "cuda_device": "NVIDIA GeForce RTX 4070 Ti SUPER",
+    "logical_cpu_count": 16,
+    "process_memory_rss_bytes": 1368776704,
+    "total_memory_bytes": 33409392640,
+    "free_memory_bytes": 10771337216,
+    "workspace_drive": "D:\\",
+    "drive_total_bytes": 500098396160,
+    "drive_used_bytes": 443641999360,
+    "drive_free_bytes": 56456396800
+  },
+  "gate_failures": [],
+  "metrics_csv_updated": false,
+  "manuscript_conclusion_changed": false
+}

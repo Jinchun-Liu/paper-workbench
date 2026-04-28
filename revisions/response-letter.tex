@@ -1,0 +1,140 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+
+\newcommand{\code}[1]{\texttt{\detokenize{#1}}}
+\newcommand{\resp}[3]{\paragraph{Comment summary.} #1\par\paragraph{Response and changes made.} #2\par\paragraph{Manuscript location.} #3\par}
+
+\begin{document}
+\emergencystretch=2em
+
+\begin{center}
+{\Large\bfseries Point-by-Point Response to the Reviewers}
+\end{center}
+
+We thank the editor and reviewers for the detailed feedback. The revision reframes the manuscript as a reproducible public-trace evaluation and service-level boundary-mapping study, rather than as a blanket model-superiority claim. The response below describes the manuscript changes, additional experiments, and the conservative boundaries retained to avoid unsupported claims.
+
+\section*{Summary of Major Changes}
+
+\begin{enumerate}[leftmargin=*]
+\item We tightened the claim hierarchy throughout the abstract, introduction, results, threats, and conclusion: the manuscript now emphasizes reproducible public-trace evaluation, multi-granularity evidence, and service-level boundary mapping.
+\item We specified the current \code{UA-MSTCN-Lite} implementation as a paper-specific lightweight uncertainty-aware surrogate, including its feature extractor, tree learner, quantile construction, calibration, clipping, and transfer-training route.
+\item We added a simpler quantile linear regression (QLR) uncertainty baseline with P50/P90 outputs, raw P90/P50 crossing diagnostics, guarded P90 policy input, and evaluation-only use of the held-out test split.
+\item We expanded and clarified the service-level evidence: the audited 139-service cohort remains the main service-level \code{UA-MSTCN-Lite} result, while the approved full 139-service QLR and Full UA-MSTCN broad runs are treated as mixed boundary evidence rather than as new superiority claims.
+\item We made the requested wording, equation, caption, table-title, related-work, and figure-readability edits.
+\end{enumerate}
+
+\section*{Additional Experiments and Artifacts}
+
+The revision adds QLR aggregate full forecasting and predictive-policy evaluation, a bounded five-service QLR service pilot, a 10-service QLR calibration run under \code{--num-workers 2}, a 139-service QLR resource, approval, and guarded preflight package, an explicitly approved full 139-service QLR broad run, Full UA-MSTCN Stage 1 smoke, Stage 2 aggregate/service-pilot, broad batch-size calibration runs after the QLR broad gate, and a guarded 139-service Full UA-MSTCN broad full-model run. The aggregate QLR result is summarized in the manuscript as completed evidence. The full 139-service QLR broad run passed its gate after explicit approval, but its policy outcome is mixed; it is therefore recorded as conservative boundary evidence rather than as a new main-conclusion claim. The Full UA-MSTCN smoke, Stage 2 pilot, broad batch-size calibration, and guarded broad run verify that the deep PyTorch backbone can start, train on the aggregate full series and a fixed five-service pilot, calibrate P90 on validation only, use the local GPU on a 139-service train/validation calibration slice, and complete an explicitly approved 139-service broad full-model run. The broad Full UA-MSTCN policy evidence is also mixed, so we do not convert it into a superiority claim or change the manuscript's headline conclusion.
+
+\section*{Editor-Level Claim Calibration}
+
+\paragraph{Concern.} The earlier framing risked overstating the current model and controller.
+
+\paragraph{Response.} We agree and revised the claim hierarchy. The manuscript now states that the central contribution is an evaluation benchmark and boundary map, not a validated new production controller or a full deep UA-MSTCN architecture. The abstract and conclusion explicitly preserve the negative service-level result: predictive control raises mean SLA violation and scaling actions versus reactive control on the audited 139-service cohort, while the over-provisioning reduction is not stable under paired service bootstrap.
+
+\paragraph{Manuscript location.} Abstract; introduction contribution list; results service-level section; conclusion.
+
+\section*{Reviewer 1}
+
+\subsection*{R1.1 Abstract Horizon Mapping}
+\resp{The abstract should map each P90 coverage value to its forecast horizon.}{We revised the abstract sentence so that the P90 coverage values 0.920, 0.867, and 0.868 are explicitly mapped to the 1-, 5-, and 10-minute horizons, respectively.}{Abstract.}
+
+\subsection*{R1.2 Public Artifact Link}
+\paragraph{Comment summary.} The paper should provide a reproducibility artifact link.
+\paragraph{Response and changes made.} We added the requested public repository link in the Introduction and synchronized the Data availability and Code availability statements to the same URL: \url{https://github.com/Jinchun-Liu/paper-workbench}. The revised text states that the preprocessing scripts, model training code, broad service-cohort construction route, figure-generation artifacts, and predictive-control simulator are released through this repository.
+\paragraph{Manuscript location.} Introduction; Statements and Declarations, Data availability and Code availability.
+
+\subsection*{R1.3 Related Work Table Line Break}
+\resp{Table 1 contained an awkward line-break artifact.}{We kept the intended sentence in Table 1 as a single coherent statement: the present study couples forecasting, transfer, and trace-driven control under one reproducible public-trace pipeline.}{Table 1.}
+
+\subsection*{R1.4 Required-Capacity Mapping Equation}
+\resp{The required-capacity mapping needed clearer notation and definition.}{We rewrote the service-level required-capacity equation using \(\smash{c^\star_{e,t}}\) and moved the definition of \(r_e\) immediately after the displayed equation.}{Method section, required-capacity mapping paragraph.}
+
+\subsection*{R1.5 Predictive Policy Scale-In Formula}
+\resp{The predictive policy scale-in line needed to be syntactically complete.}{We corrected the scale-in row so that it now uses the complete expression based on the current capacity, maximum step change, safety margin, and median forecast.}{Method section, predictive policy paragraph.}
+
+\subsection*{R1.6 Service-Route Sentence Placement}
+\resp{The service-route limitation sentence should be placed near the service-cohort selection rule.}{We moved the statement that the cohort is broader but not a full population census to the beginning of the service-route rule paragraph and added an explicit reference to Table 2.}{Experiments section, container service cohort subsection.}
+
+\subsection*{R1.7 Table 2 Caption}
+\resp{The service cohort table caption should clearly describe the official container-table cohort.}{We verified and retained the caption: ``Summary statistics of the broad Alibaba service-level cohort extracted from the official container tables.''}{Table 2.}
+
+\subsection*{R1.8 Figure 1 Caption}
+\resp{Figure 1 should name the subplot assignments.}{We updated the caption to identify the top-left, top-right, bottom-left, and bottom-right panels as CPU utilization, memory utilization, active-machine counts, and first-day zoom.}{Figure 1.}
+
+\subsection*{R1.9 Table 4 Title and Smoke-Test Terminology}
+\resp{The final reported forecasting table should not be labeled as a smoke test.}{We changed the Table 4 caption to ``Leakage-free forecasting performance on the aggregate cluster series (MAE, RMSE, MAPE)'' and retained leakage-free terminology for final reported results.}{Table 4 and surrounding forecasting benchmark text.}
+
+\subsection*{R1.10 Figure 5 Caption}
+\resp{Figure 5 should identify the plotted models.}{We updated the caption to list persistence, linear regression, random forest, MLP regressor, and \code{UA-MSTCN-Lite} as the overlaid predictions.}{Figure 5.}
+
+\subsection*{R1.11 Context-Window Repeated Fragment}
+\resp{A repeated fragment in the context-window paragraph should be removed.}{The context-window paragraph now contains a single clean statement: a 60-minute window gives the best average MAE, compared with 30- and 120-minute windows.}{Results section, context sensitivity paragraph.}
+
+\subsection*{R1.12 Quantile-Coverage Dashed Lines}
+\resp{The quantile-coverage caption should specify the dashed-line target levels.}{We updated the caption to state that the dashed lines indicate the nominal target levels of 0.5 for P50 and 0.9 for P90.}{Quantile-coverage figure, currently Figure 9 in the compiled PDF.}
+
+\section*{Reviewer 2}
+
+\subsection*{R2.1 UA-MSTCN-Lite Specification}
+\resp{The earlier manuscript under-specified \code{UA-MSTCN-Lite}.}{We now identify \code{UA-MSTCN-Lite} as a paper-specific lightweight quantile-forest surrogate, not the full deep UA-MSTCN architecture. We added the concrete 60-minute input window, 1/5/10-minute horizons, lag features, multi-scale summary windows, learner configuration, quantile construction, residual calibration, clipping rule, and pooled multi-entity training route.}{Method section, forecasting backbone paragraph.}
+
+\subsection*{R2.2 Results Do Not Support a Model-Superiority Claim}
+\resp{The results did not justify a broad model-superiority claim.}{We agree. The paper no longer claims that the current surrogate is a superior forecasting model or validated controller architecture. The revised claim hierarchy is: public traces support reproducible forecasting-to-control evaluation; simple linear models remain strong point baselines; uncertainty-aware quantiles can feed predictive control; and the shared predictive policy is not validated as a stable service-level improvement route.}{Abstract; introduction contribution list; forecasting benchmark; service-level evidence; conclusion.}
+
+\subsection*{R2.3 Simpler Uncertainty-Aware Baseline}
+\paragraph{Comment summary.} The reviewer requested a simpler uncertainty-aware comparison.
+\paragraph{Response and changes made.} We added QLR as a simpler uncertainty-aware baseline. The implementation produces P50 and raw P90 forecasts, records raw P90/P50 crossing counts and rates, and then uses guarded P90 defined as \code{max(raw_p90, p50)} for policy input after raw behavior is recorded. The held-out test split is used only for evaluation; model fitting uses the train+validation prefix only, and test data are not used for model, parameter, service, or policy selection.
+\paragraph{Evidence.} On the aggregate trace, QLR obtains MAE 2.265, 3.967, and 4.315 at the 1-, 5-, and 10-minute horizons, with zero raw and guarded P90/P50 crossings. In the 5-minute policy route, QLR predictive control has SLA violation 0.033993, over-provisioning 0.147416, and 587 scaling actions. This is safer than lagged target tracking on SLA violation, but worse than reactive control on SLA and scaling actions.
+\paragraph{Boundary.} We also ran a five-service pilot and 10-service calibration for service-level QLR, then executed the full 139-service QLR broad run after explicit approval. The broad run passed its gate, preserved raw P90/P50 crossing diagnostics (8,963 raw crossings) and guarded non-crossing P90 outputs (0 guarded crossings), and left central \code{metrics.csv} unchanged. Its service-policy result is mixed: QLR predictive control has mean SLA violation 0.0206 versus 0.0173 for reactive control, mean over-provisioning 54.71 versus 56.31, and more scaling actions. We therefore do not present it as QLR superiority or change the manuscript's headline conclusion on that basis alone.
+\paragraph{Manuscript location.} Experiments section, forecasting and policy configuration; Results section, Table 5 and the QLR policy paragraph near Table 12.
+
+\subsection*{R2.4 Practical Benefit}
+\resp{The practical benefit of predictive control was not convincing.}{We revised the practical interpretation. The aggregate trace still shows a predictive-control trade-off, but the broad service-level result changes the operational conclusion: the shared predictive policy worsens SLA violation and scaling actions under heterogeneous services. We present the pipeline as diagnostic evidence that identifies where predictive control fails, not as proof that it should replace reactive control.}{Results service-level evidence; conclusion.}
+
+\subsection*{R2.5 Novelty Claim}
+\resp{The novelty claim was too weak if framed mainly as a new model.}{We reframed novelty around the reproducible public-trace evaluation pipeline, leakage-free protocol, multi-granularity evidence, cross-machine transfer, broad service-level audit, and explicit mixed/negative policy findings. We do not claim a new full deep architecture in the current manuscript.}{Introduction; method; conclusion.}
+
+\section*{Reviewer 3}
+
+\subsection*{R3.1 Section 2 Preamble}
+\resp{Section 2 needed a preamble.}{We added a preamble that organizes related work around workload characterization, forecasting, and control, and explains the reproducible public-trace gap addressed by the paper.}{Beginning of Related Work.}
+
+\subsection*{R3.2 Section 4 Preamble}
+\resp{Section 4 needed a preamble.}{We added a preamble describing the trace-processing and evaluation protocol and its progression from aggregate cluster usage to machine entities, cross-machine transfer, and the audited service-level cohort. The preamble also states the chronological split discipline.}{Beginning of Experiments.}
+
+\subsection*{R3.3 Recent Related Work and Gul 2022}
+\resp{The related work needed broader recent coverage and the Gul 2022 resource-reservation citation.}{We added Gul 2022 in the predictive autoscaling/resource-reservation discussion and made recent 2023--2026 service-granular, uncertainty-aware, and predictive autoscaling studies more visible in the related-work positioning.}{Related Work, predictive autoscaling and uncertainty-aware control subsection.}
+
+\subsection*{R3.4 Figure Readability}
+\resp{Several figures should be enlarged and checked for readability.}{We enlarged the manuscript-level rendering widths for the reviewer-mentioned figures where the LaTeX source controlled size, including the aggregate overview, distribution views, service workload overview, forecast case study, and latency trade-off figures. Captions were also clarified where requested by Reviewer 1. The current manuscript PDF has been rebuilt after these changes.}{Figures 1, 2, 3, 5, and 6 in the current compiled PDF.}
+
+\section*{Broad QLR Execution Result and Boundary}
+
+After preparing the approval package and guarded preflight, we executed the full 139-service QLR run only after explicit approval with the required confirmation token recorded in the run registry. The run completed all 139 services, wrote full forecasting and policy artifacts, passed the broad gate, and preserved the evaluation-only test split discipline. The central \code{metrics.csv} hash stayed unchanged. The result is mixed policy evidence rather than a superiority result, so we keep it separate from the manuscript's headline conclusion unless the authors decide to revise the manuscript tables and discussion conservatively.
+
+\section*{Broad Full UA-MSTCN Execution Result and Boundary}
+
+After the QLR broad gate, Full UA-MSTCN proceeded through a staged ladder: Stage 1 smoke, Stage 2 aggregate/service pilot, broad batch-size calibration, broad approval, guarded preflight, and then an explicitly confirmed 139-service broad full-model run. The broad run completed all 139 services, trained for 20 epochs, wrote full forecasting, calibration, prediction, policy, and resource artifacts, and passed its gate. It preserved the same split discipline: fitting used the train prefix, early stopping and P90 calibration used validation, and the held-out test split was used only for evaluation. The central \code{metrics.csv} hash stayed unchanged.
+
+The broad Full UA-MSTCN result is mixed rather than a superiority result. Mean test MAE over 139 services is 26.677, 36.834, and 42.829 for horizons 1, 5, and 10, and mean calibrated P90 coverage is 0.918, 0.906, and 0.901. For the 5-minute policy route, Full UA-MSTCN predictive control has mean SLA violation 0.0219, mean over-provisioning 52.07, and 377.18 scaling actions, compared with reactive control at mean SLA violation 0.0173, mean over-provisioning 56.20, and 248.06 scaling actions. Thus Full UA-MSTCN predictive control lowers average over-provisioning but has higher SLA violation and more scaling actions. We report this as conservative boundary evidence and do not change the manuscript's headline conclusion on this basis.
+
+\section*{Revisions Not Fully Adopted or Deferred}
+
+The Full UA-MSTCN ladder is now completed through the approved broad full-model run, but the result is still not presented as a model-superiority proof. The Stage 1 smoke, Stage 2 aggregate/service pilot, broad calibration, approval, and preflight artifacts document the execution path. The broad full-model run is completed evidence, but its service-policy outcome remains mixed: it improves mean over-provisioning relative to reactive control while worsening mean SLA violation and scaling-action count. Full UA-MSTCN ablation and stress-test results remain future gates.
+
+\section*{Claims Not Made}
+
+\begin{itemize}[leftmargin=*]
+\item We do not claim that QLR is universally superior.
+\item We do not claim broad 139-service QLR superiority after the full run; the verified outcome is mixed.
+\item We do not claim broad Full UA-MSTCN superiority after the full run; the verified outcome is mixed.
+\item We do not change the manuscript's headline conclusion based on pilot, calibration, approval, preflight, broad QLR, or broad Full UA-MSTCN artifacts alone.
+\end{itemize}
+
+\end{document}

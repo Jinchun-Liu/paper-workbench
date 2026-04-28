@@ -91,6 +91,7 @@ def main() -> None:
     build_script = repo_root / "experiments" / "preprocessing" / "build_broad_service_cohort.py"
     experiment_script = repo_root / "experiments" / "run_container_service_experiments.py"
     stability_script = repo_root / "experiments" / "analyze_service_cohort_stability.py"
+    mechanism_script = repo_root / "experiments" / "analyze_service_policy_mechanisms.py"
 
     build_cmd = [
         python_executable,
@@ -159,6 +160,23 @@ def main() -> None:
             str(args.bootstrap_seed),
             "--bootstrap-resamples",
             str(args.bootstrap_resamples),
+        ]
+    )
+
+    run_step(
+        [
+            python_executable,
+            str(mechanism_script),
+            "--service-csv",
+            str(args.broad_service_csv),
+            "--service-summary-csv",
+            str(args.broad_summary_csv),
+            "--policy-delta-csv",
+            str(args.broad_output_dir / "tables" / "service_policy_delta_by_service.csv"),
+            "--stability-summary-csv",
+            str(args.broad_output_dir / "tables" / "service_cohort_stability_summary.csv"),
+            "--output-dir",
+            str(args.broad_output_dir),
         ]
     )
 

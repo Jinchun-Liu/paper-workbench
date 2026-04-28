@@ -1,0 +1,43 @@
+{
+  "run_id": "full_ua_mstcn_broad_approval_20260428",
+  "status": "pass",
+  "scope": "approval planning only; no broad Full UA-MSTCN run executed",
+  "output_dir": "D:\\Desktop\\Cluster Computing\\paper-workbench-full\\Users\\liujinchun\\Downloads\\skills_codex\\paper-workbench\\experiments\\results\\full_ua_mstcn_broad_approval",
+  "service_count": 139,
+  "target_batch_size": 1024,
+  "max_epochs": 20,
+  "patience": 4,
+  "metrics_csv_hash_before": "0fa3fdb810ca0a0f74592d3adc92102c7a0ca67ea02c2b8c8f22435537f873ab",
+  "metrics_csv_hash_after": "0fa3fdb810ca0a0f74592d3adc92102c7a0ca67ea02c2b8c8f22435537f873ab",
+  "full_broad_run_executed": false,
+  "full_result_dir_exists": false,
+  "resource_census": {
+    "os": "Windows-10-10.0.26200-SP0",
+    "python": "3.10.19 | packaged by Anaconda, Inc. | (main, Oct 21 2025, 16:41:31) [MSC v.1929 64 bit (AMD64)]",
+    "logical_cpu_count": 16,
+    "total_memory_bytes": 33409392640,
+    "free_memory_bytes": 11504234496,
+    "workspace_drive": "D:\\",
+    "drive_total_bytes": 500098396160,
+    "drive_used_bytes": 443644526592,
+    "drive_free_bytes": 56453869568
+  },
+  "estimates": {
+    "train_windows_total": 1111166,
+    "validation_windows_total": 239080,
+    "prediction_rows_total": 718769,
+    "train_throughput_windows_per_second": 33606.747831514105,
+    "validation_throughput_windows_per_second": 142568.78632756323,
+    "train_seconds_per_epoch_estimate": 33.063776524011786,
+    "validation_seconds_per_epoch_estimate": 1.6769449060939223,
+    "test_eval_seconds_estimate": 5.041559365937019,
+    "lower_bound_wall_seconds": 699.8559879680512,
+    "safety_adjusted_wall_seconds": 1399.7119759361024,
+    "pilot_artifact_bytes": 12808487,
+    "pilot_prediction_rows": 59460,
+    "artifact_bytes_from_pilot_density": 154832549,
+    "artifact_bytes_floor": 154832549,
+    "safety_adjusted_artifact_bytes": 309665098
+  },
+  "gate_failures": []
+}
